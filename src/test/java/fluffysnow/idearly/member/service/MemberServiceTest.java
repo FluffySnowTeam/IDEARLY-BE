@@ -1,12 +1,10 @@
 package fluffysnow.idearly.member.service;
 
 import fluffysnow.idearly.member.domain.Member;
-import fluffysnow.idearly.member.dto.MemberDto;
-import fluffysnow.idearly.member.repository.MemberRepository;
+import fluffysnow.idearly.member.dto.MemberCreateRequestDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,11 +19,7 @@ class MemberServiceTest {
     @Test
     void createUser() {
 
-        MemberDto dto = MemberDto.builder()
-                .email("aaa@naver.com")
-                .name("Gwan")
-                .password("123")
-                .build();
+        MemberCreateRequestDto dto = new MemberCreateRequestDto("aaa@naver.com", "Gwan", "123");
 
         Member member = memberService.createUser(dto);
 

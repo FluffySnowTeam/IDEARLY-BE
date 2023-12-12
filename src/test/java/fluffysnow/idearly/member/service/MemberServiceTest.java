@@ -2,6 +2,7 @@ package fluffysnow.idearly.member.service;
 
 import fluffysnow.idearly.member.domain.Member;
 import fluffysnow.idearly.member.dto.MemberCreateRequestDto;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+@Slf4j
 class MemberServiceTest {
 
     @Autowired
@@ -23,7 +25,7 @@ class MemberServiceTest {
 
         Member member = memberService.createUser(dto);
 
-        System.out.println(member.getPassword());
+        log.info("password: {}", member.getPassword());
 
         assertNotNull(member);
         assertEquals(dto.getName(), member.getName());

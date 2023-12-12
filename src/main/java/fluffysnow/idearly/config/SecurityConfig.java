@@ -33,6 +33,10 @@ public class SecurityConfig {
                 );
         http
                 .formLogin(AbstractHttpConfigurer::disable)
+//                .formLogin(form -> form
+//                        .loginPage("/login")
+//                        .defaultSuccessUrl("/")
+//                        .permitAll())
                 .httpBasic(AbstractHttpConfigurer::disable);
         return http.build();
     }

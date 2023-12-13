@@ -3,10 +3,7 @@ package fluffysnow.idearly.member.service;
 import fluffysnow.idearly.common.Role;
 import fluffysnow.idearly.config.jwt.JwtProvider;
 import fluffysnow.idearly.member.domain.Member;
-import fluffysnow.idearly.member.dto.LoginRequestDto;
-import fluffysnow.idearly.member.dto.MemberCreateRequestDto;
-import fluffysnow.idearly.member.dto.TokenDto;
-import fluffysnow.idearly.member.dto.TokenRequestDto;
+import fluffysnow.idearly.member.dto.*;
 import fluffysnow.idearly.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,17 +32,18 @@ public class MemberService {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
-    public Member createUser(MemberCreateRequestDto dto) {
+    public SignupResponseDto createUser(MemberCreateRequestDto dto) {
         Optional<Member> memberOptional = memberRepository.findByEmail(dto.getEmail());
         if (memberOptional.isPresent()) {
-            log.info("이미 존재하는 이메일입니다.");
+            log.info("이미 존재하는 이메일입니다."); // 에러 처리
         }
         Member encoding = new Member(dto.getEmail(), dto.getName(), bCryptPasswordEncoder.encode(dto.getPassword()), Role.USER);
 
-        return memberRepository.save(encoding);
+        memberRepository.save(encoding);
+        return SignupResponseDto.of(encoding);
     }
 
-    public TokenDto login(LoginRequestDto loginRequestDto) {
+    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
 
         // 1. Login ID/PW 를 기반으로 Authentication 객체 생성
         // 이때 authentication 는 인증 여부를 확인하는 authenticated 값이 false
@@ -62,10 +60,10 @@ public class MemberService {
                 TimeUnit.MILLISECONDS);
 
         log.info("로그인 완료");
-        return tokenDto;
+        return LoginResponseDto.of(tokenDto);
     }
 
-    public String reissue(TokenRequestDto dto) {
+    public TokenDto reissue(TokenRequestDto dto) {
         if (!jwtProvider.validateToken(dto.getRefreshToken())) {
             log.info("FAIL"); //에러 처리
         }
@@ -90,7 +88,7 @@ public class MemberService {
                 .set("RT:" + authentication.getName(), tokenDto.getRefreshToken(),
                         tokenDto.getRefreshTokenExpiresIn(), TimeUnit.MILLISECONDS);
 
-        return tokenDto.getAccessToken();
+        return tokenDto;
     }
 
     public void logout(TokenRequestDto dto) {

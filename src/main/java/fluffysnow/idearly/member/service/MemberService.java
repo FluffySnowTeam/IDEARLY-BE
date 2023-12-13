@@ -1,6 +1,7 @@
 package fluffysnow.idearly.member.service;
 
 import fluffysnow.idearly.common.Role;
+import fluffysnow.idearly.config.CustomUserDetails;
 import fluffysnow.idearly.config.jwt.JwtProvider;
 import fluffysnow.idearly.member.domain.Member;
 import fluffysnow.idearly.member.dto.*;
@@ -52,6 +53,7 @@ public class MemberService {
         // 2. 실제 검증 (사용자 비밀번호 체크)이 이루어지는 부분
         // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
 
         TokenDto tokenDto = jwtProvider.createTokenDto(authentication);
 
@@ -60,7 +62,7 @@ public class MemberService {
                 TimeUnit.MILLISECONDS);
 
         log.info("로그인 완료");
-        return LoginResponseDto.of(tokenDto);
+        return LoginResponseDto.of(principal, tokenDto);
     }
 
     public TokenDto reissue(TokenRequestDto dto) {

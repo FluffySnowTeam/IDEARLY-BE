@@ -24,6 +24,10 @@ public class CustomUserDetails implements UserDetails {
         return memberRequestDto.getId();
     }
 
+    public String getName() {
+        return memberRequestDto.getName();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> role = new ArrayList<>();

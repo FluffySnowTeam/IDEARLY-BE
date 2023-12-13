@@ -29,10 +29,10 @@ public class MemberController {
     public ApiResponse<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         LoginResponseDto loginResponseDto = memberService.login(loginRequestDto);
         Cookie cookie = new Cookie("accessToken", loginResponseDto.getAccessToken());
-        cookie.setPath("/**");
+        cookie.setPath("/");
         cookie.setMaxAge(1000 * 60 * 60 * 3); // 액세스 토큰: 3시간
         Cookie c = new Cookie("refreshToken", loginResponseDto.getRefreshToken());
-        c.setPath("/**");
+        c.setPath("/");
         c.setMaxAge(1000 * 60 * 60 * 3); // 리프레쉬 토큰: 3시간
         response.addCookie(cookie);
         response.addCookie(c);
@@ -49,6 +49,7 @@ public class MemberController {
                 if ("accessToken".equals(cookie.getName())) {
                     // 기존 쿠키 수정
                     cookie.setValue(tokenDto.getAccessToken());
+                    cookie.setPath("/");
                     cookie.setMaxAge(1000 * 60 * 60 * 3); // 쿠키의 유효 시간 설정 (초 단위)
                     response.addCookie(cookie);
                 }
@@ -57,6 +58,7 @@ public class MemberController {
                 if ("refreshToken".equals(cookie.getName())) {
                     // 기존 쿠키 수정
                     cookie.setValue(tokenDto.getRefreshToken());
+                    cookie.setPath("/");
                     cookie.setMaxAge(1000 * 60 * 60 * 3); // 쿠키의 유효 시간 설정 (초 단위)
                     response.addCookie(cookie);
                 }

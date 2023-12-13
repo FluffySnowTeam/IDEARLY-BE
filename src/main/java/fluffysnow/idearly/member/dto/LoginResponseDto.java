@@ -1,5 +1,6 @@
 package fluffysnow.idearly.member.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import fluffysnow.idearly.config.CustomUserDetails;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,22 +15,18 @@ public class LoginResponseDto {
     private Long memberId;
     private String email;
     private String name;
-    private TokenDto tokenDto;
+    @JsonIgnore
+    private String accessToken;
+    @JsonIgnore
+    private String refreshToken;
 
     public static LoginResponseDto of(CustomUserDetails customUserDetails, TokenDto tokenDto) {
         return new LoginResponseDto(
                 customUserDetails.getId(),
                 customUserDetails.getUsername(),
                 customUserDetails.getName(),
-                tokenDto
+                tokenDto.getAccessToken(),
+                tokenDto.getRefreshToken()
         );
-    }
-
-    public String getAccessToken() {
-        return tokenDto.getAccessToken();
-    }
-
-    public String getRefreshToken() {
-        return tokenDto.getRefreshToken();
     }
 }

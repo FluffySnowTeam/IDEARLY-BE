@@ -14,16 +14,22 @@ public class LoginResponseDto {
     private Long memberId;
     private String email;
     private String name;
-    private String accessToken;
-    private String refreshToken;
+    private TokenDto tokenDto;
 
     public static LoginResponseDto of(CustomUserDetails customUserDetails, TokenDto tokenDto) {
         return new LoginResponseDto(
                 customUserDetails.getId(),
                 customUserDetails.getUsername(),
                 customUserDetails.getName(),
-                tokenDto.getAccessToken(),
-                tokenDto.getRefreshToken()
+                tokenDto
         );
+    }
+
+    public String getAccessToken() {
+        return tokenDto.getAccessToken();
+    }
+
+    public String getRefreshToken() {
+        return tokenDto.getRefreshToken();
     }
 }

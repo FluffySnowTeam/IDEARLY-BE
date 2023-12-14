@@ -19,6 +19,11 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @GetMapping
+    public String test() {
+        return "ok";
+    }
+
     @PostMapping("/signup")
     public ApiResponse<SignupResponseDto> createUser(@RequestBody MemberCreateRequestDto dto) {
         SignupResponseDto response = memberService.createUser(dto);

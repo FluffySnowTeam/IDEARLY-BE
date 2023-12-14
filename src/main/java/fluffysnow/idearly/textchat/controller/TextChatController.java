@@ -27,14 +27,19 @@ public class TextChatController {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final TextChatContextHolder textChatContextHolder;
 
-    // /topic/teams/{teamId} 를 구독(subscribe) 신청할 때 발생하는 이벤트
+    // /topic/teams/{teamId} 를 구독(subscribe) 신청할 때 발생하는 이벤트 - 입장 알림 등에 활용
 //    @SubscribeMapping("/teams/{teamId}")
 //    public void enterTextChatRoom(@DestinationVariable("teamId") Long teamId) {
 //        simpMessagingTemplate.convertAndSend("/topic/teams/" + teamId, "hello");
 //    }
 
 
-    // /pub/teams/{teamId} 에 메시지를 발행(publish)할 때의 요청
+    /**
+     * /pub/teams/{teamId} 에 메시지를 발행(publish)할 때의 요청
+     * 세션을 이용해 Member를 식별하고,
+     * 메시지와 해당 멤버 정보를 이용해 메시지를 전송
+     * (인증은 Handshake 시점에 수행하며, 인가 권한은 ChannelInboundInterceptor에서 수행)
+     */
     @MessageMapping("/teams/{teamId}")
     public void sendTextChat(TextChatRequestDto message,
                              @DestinationVariable("teamId") Long teamId,
@@ -45,12 +50,12 @@ public class TextChatController {
 
         TextChatResponseDto responseDto = TextChatResponseDto.of(message.getChatMessage(), loginMember);
 
-        // 테스트용
-//        TextChatResponseDto responseDto = new TextChatResponseDto(UUID.randomUUID().toString(), message.getChatMessage(), "sender", "senderEmail", LocalDateTime.now());
-
         simpMessagingTemplate.convertAndSend("/topic/teams/" + teamId, responseDto);
     }
 
+    /**
+     * StompHeaderAccessor로부터 현재 연결된 세션 ID를 가져오는 기능
+     */
     private String getSessionId(StompHeaderAccessor header) {
         Map<String, Object> sessionAttributes = header.getSessionAttributes();
         return sessionAttributes.get(MY_SESSION_ID).toString();

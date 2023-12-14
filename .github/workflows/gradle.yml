@@ -77,5 +77,6 @@ jobs:
         port: ${{ secrets.PORT }}
         script: |
           sudo docker rm -f $(docker ps -qa)
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/idearly-api
           sudo docker-compose up -d
           sudo docker image prune -f

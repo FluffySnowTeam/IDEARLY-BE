@@ -109,4 +109,11 @@ public class MemberService {
         redisTemplate.opsForValue()
                 .set(dto.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
     }
+
+    public Member findLoginMember(String accessToken) {
+        Authentication authentication = jwtProvider.getAuthentication(accessToken);
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        return memberRepository.findById(customUserDetails.getId()).orElseThrow();  //userNotFound 예외
+    }
 }

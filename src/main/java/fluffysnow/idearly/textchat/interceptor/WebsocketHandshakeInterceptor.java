@@ -44,20 +44,17 @@ public class WebsocketHandshakeInterceptor implements HandshakeInterceptor {
             ServletServerHttpRequest servletServerHttpRequest = (ServletServerHttpRequest) request;
             HttpServletRequest servletRequest = servletServerHttpRequest.getServletRequest();
 
-//            Cookie cookie = WebUtils.getCookie(servletRequest, HTTP_ACCESS_TOKEN_NAME);
-//            if (cookie == null) {
-//                throw new IllegalStateException("인증되지 않은 사용자의 websocket 연결 시도.");
-//            }
-//            log.info("JWT TOKEN: {}", cookie.getValue());
+            // 예시
+            // 실제로는 JWT TOKEN을 기준으로 Member를 찾아야함
+            Member loginMember = new Member("senderEmail@a.com", "senderName", "asdasd", Role.USER);
 
-            // 실제로는 JWT TOKEN을 기준으로 memberId를 꺼내고 repository에 접근하여 멤버를 찾아야함
-            // memberService에 기능 추가 필요
-            Long memberId = 1L;
-            Member findMember = new Member("senderEmail@a.com", "senderName", "asdasd", Role.USER);
+            // 실제 동작
+//            Member loginMember = getLoginMember(servletRequest);
 
+            // 세션을 만들어 현재 회원을 저장
             String sessionId = UUID.randomUUID().toString();
             attributes.put(MY_SESSION_ID, sessionId);
-            contextHolder.putMember(sessionId, findMember);
+            contextHolder.putMember(sessionId, loginMember);
 
             return true;
         }
@@ -68,5 +65,14 @@ public class WebsocketHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
 
+    }
+
+    private Member getLoginMember(HttpServletRequest servletRequest) {
+        Cookie cookie = WebUtils.getCookie(servletRequest, HTTP_ACCESS_TOKEN_NAME);
+        if (cookie == null) {
+            throw new IllegalStateException("인증되지 않은 사용자의 websocket 연결 시도.");
+        }
+        log.info("JWT ACCESS TOKEN: {}", cookie.getValue());
+        return memberService.findLoginMember(cookie.getValue());
     }
 }

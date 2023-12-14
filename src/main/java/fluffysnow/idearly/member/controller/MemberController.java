@@ -36,11 +36,15 @@ public class MemberController {
         Cookie cookie = new Cookie("accessToken", loginResponseDto.getAccessToken());
         cookie.setPath("/");
         cookie.setMaxAge(1000 * 60 * 60 * 3); // 액세스 토큰: 3시간
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
         Cookie c = new Cookie("refreshToken", loginResponseDto.getRefreshToken());
         c.setPath("/");
         c.setMaxAge(1000 * 60 * 60 * 3); // 리프레쉬 토큰: 3시간
         response.addCookie(cookie);
         response.addCookie(c);
+        c.setSecure(true);
+        c.setHttpOnly(true);
         return ApiResponse.ok(loginResponseDto);
     }
 

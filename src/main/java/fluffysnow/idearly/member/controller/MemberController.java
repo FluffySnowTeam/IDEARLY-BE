@@ -41,10 +41,13 @@ public class MemberController {
         Cookie c = new Cookie("refreshToken", loginResponseDto.getRefreshToken());
         c.setPath("/");
         c.setMaxAge(1000 * 60 * 60 * 3); // 리프레쉬 토큰: 3시간
-        response.addCookie(cookie);
-        response.addCookie(c);
+//        response.addCookie(cookie);
+//        response.addCookie(c);
         c.setSecure(true);
         c.setHttpOnly(true);
+
+        response.setHeader("Set-Cookie", "accessToken=" + loginResponseDto.getAccessToken() + "; Secure; HttpOnly; SameSite=None");
+        response.setHeader("Set-Cookie", "refreshToken=" + loginResponseDto.getRefreshToken() + "; Secure; HttpOnly; SameSite=None");
         return ApiResponse.ok(loginResponseDto);
     }
 

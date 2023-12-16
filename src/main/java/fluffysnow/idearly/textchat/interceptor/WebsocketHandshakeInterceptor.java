@@ -46,10 +46,10 @@ public class WebsocketHandshakeInterceptor implements HandshakeInterceptor {
 
             // 예시
             // 실제로는 JWT TOKEN을 기준으로 Member를 찾아야함
-            Member loginMember = new Member("senderEmail@a.com", "senderName", "asdasd", Role.USER);
+//            Member loginMember = new Member("senderEmail@a.com", "senderName", "asdasd", Role.USER);
 
             // 실제 동작
-//            Member loginMember = getLoginMember(servletRequest);
+            Member loginMember = getLoginMember(servletRequest);
 
             // 세션을 만들어 현재 회원을 저장
             String sessionId = UUID.randomUUID().toString();
@@ -68,11 +68,11 @@ public class WebsocketHandshakeInterceptor implements HandshakeInterceptor {
     }
 
     private Member getLoginMember(HttpServletRequest servletRequest) {
-        Cookie cookie = WebUtils.getCookie(servletRequest, HTTP_ACCESS_TOKEN_NAME);
-        if (cookie == null) {
-            throw new IllegalStateException("인증되지 않은 사용자의 websocket 연결 시도.");
-        }
-        log.info("JWT ACCESS TOKEN: {}", cookie.getValue());
-        return memberService.findLoginMember(cookie.getValue());
+//        Cookie cookie = WebUtils.getCookie(servletRequest, HTTP_ACCESS_TOKEN_NAME);
+//        if (cookie == null) {
+//            throw new IllegalStateException("인증되지 않은 사용자의 websocket 연결 시도.");
+//        }
+//        log.info("JWT ACCESS TOKEN: {}", cookie.getValue());
+        return memberService.findLoginMember();
     }
 }

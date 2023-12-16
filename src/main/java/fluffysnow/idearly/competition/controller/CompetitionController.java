@@ -2,10 +2,7 @@ package fluffysnow.idearly.competition.controller;
 
 
 import fluffysnow.idearly.common.ApiResponse;
-import fluffysnow.idearly.competition.dto.CompetitionDetailResponseDto;
-import fluffysnow.idearly.competition.dto.CompetitionParticipateRequestDto;
-import fluffysnow.idearly.competition.dto.CompetitionParticipateResponseDto;
-import fluffysnow.idearly.competition.dto.CompetitionResponseDto;
+import fluffysnow.idearly.competition.dto.*;
 import fluffysnow.idearly.competition.service.CompetitionService;
 import fluffysnow.idearly.config.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +24,7 @@ public class CompetitionController {
     @GetMapping
     public ApiResponse<List<CompetitionResponseDto>> getCompetitionList() {
 
-        Long loginMemberId = getLoginMemberId();
-
-
-        List<CompetitionResponseDto> competitionResponseDtoList = competitionService.getCompetitionList(loginMemberId);
+        List<CompetitionResponseDto> competitionResponseDtoList = competitionService.getCompetitionList();
 
         return ApiResponse.ok(competitionResponseDtoList);
     }
@@ -39,6 +33,7 @@ public class CompetitionController {
     public ApiResponse<CompetitionDetailResponseDto> getCompetitionDetail(@PathVariable("competitionId") Long competitionId) {
 
         Long loginMemberId = getLoginMemberId();
+
         CompetitionDetailResponseDto competitionDetailResponseDto = competitionService.getCompetitionDetail(competitionId, loginMemberId);
 
         return ApiResponse.ok(competitionDetailResponseDto);
@@ -58,7 +53,22 @@ public class CompetitionController {
         return ApiResponse.ok(competitionParticipateResponseDto);
     }
 
+    /**
+     * 해당 대회의 팀에 초대할 때, 초대할 회원을 검색
+     */
+    @GetMapping("/{competitionId}/members")
+    public ApiResponse<InvitableResponseDto> invitableCheck(@PathVariable("competitionId") Long competitionId,
+                                                            @RequestParam("email") String email) {
+
+        InvitableResponseDto invitableResponseDto = competitionService.invitableCheck(competitionId, email);
+
+        return ApiResponse.ok(invitableResponseDto);
+    }
+
     // 대기실 입장 API
+//    @GetMapping("/{competitionId}/waiting-room")
+//    public ApiResponse
+
 
 
     private static Long getLoginMemberId() {

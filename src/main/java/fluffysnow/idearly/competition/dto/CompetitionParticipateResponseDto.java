@@ -22,13 +22,13 @@ public class CompetitionParticipateResponseDto {
     private String teamName;
     private List<TeammateResponseDto> teammates;
 
-    public static CompetitionParticipateResponseDto of(Competition competition, Team team, List<MemberTeam> memberTeamList) {
+    public static CompetitionParticipateResponseDto of(Competition competition, Team team) {
         return new CompetitionParticipateResponseDto(
                 competition.getId(),
                 competition.getName(),
                 team.getId(),
                 team.getName(),
-                memberTeamList.stream().map(TeammateResponseDto::from).toList()
+                team.getMemberTeamList().stream().map(TeammateResponseDto::from).toList()
         );
     }
 

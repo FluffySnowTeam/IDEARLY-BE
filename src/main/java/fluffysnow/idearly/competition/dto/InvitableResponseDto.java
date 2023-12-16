@@ -25,7 +25,7 @@ public class InvitableResponseDto {
     public static InvitableResponseDto of(Member member, boolean invitable) {
 
         if (member == null) {
-            return new InvitableResponseDto(true, null, null, invitable);
+            return new InvitableResponseDto(false, null, null, invitable);
         }
 
         return new InvitableResponseDto(true, member.getName(), member.getEmail(), invitable);

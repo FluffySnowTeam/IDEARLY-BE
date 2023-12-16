@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,7 +34,7 @@ public class Team extends BaseEntity {
     private Competition competition;
 
     @OneToMany(mappedBy = "team")
-    private List<MemberTeam> memberTeamList;
+    private List<MemberTeam> memberTeamList = new ArrayList<>();
 
     public Team(String name, Member leader, Competition competition) {
         this.name = name;

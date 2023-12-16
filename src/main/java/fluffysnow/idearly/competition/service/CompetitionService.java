@@ -95,4 +95,11 @@ public class CompetitionService {
         boolean invitable = memberTeamRepository.findByMemberIdAndCompetitionId(findMember.getId(), competitionId).isEmpty();
         return InvitableResponseDto.of(findMember, invitable);
     }
+
+    public Competition createCompetition(CompetitionCreateRequestDto requestDto, Member adminMember) {
+
+        Competition competition = new Competition(requestDto.getTitle(), requestDto.getDescription(), requestDto.getStartDateTime(), requestDto.getEndDateTime(), adminMember);
+
+        return competitionRepository.save(competition);
+    }
 }

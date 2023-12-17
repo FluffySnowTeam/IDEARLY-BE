@@ -1,22 +1,17 @@
 package fluffysnow.idearly.textchat.interceptor;
 
-import fluffysnow.idearly.common.Role;
 import fluffysnow.idearly.member.domain.Member;
-import fluffysnow.idearly.member.repository.MemberRepository;
-import fluffysnow.idearly.member.service.MemberService;
+import fluffysnow.idearly.member.service.CustomUserDetailsService;
 import fluffysnow.idearly.textchat.common.TextChatContextHolder;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
-import org.springframework.web.util.WebUtils;
 
 import java.util.Map;
 import java.util.UUID;
@@ -30,7 +25,7 @@ import static fluffysnow.idearly.textchat.common.TextChatConst.MY_SESSION_ID;
 public class WebsocketHandshakeInterceptor implements HandshakeInterceptor {
 
     private final TextChatContextHolder contextHolder;
-    private final MemberService memberService;    //contextHolder 관리에 필요
+    private final CustomUserDetailsService userDetailsService;    //contextHolder 관리에 필요
 
     /**
      * 웹소켓 연결 요청시에 인증된 사용자인지 확인.
@@ -68,11 +63,7 @@ public class WebsocketHandshakeInterceptor implements HandshakeInterceptor {
     }
 
     private Member getLoginMember(HttpServletRequest servletRequest) {
-//        Cookie cookie = WebUtils.getCookie(servletRequest, HTTP_ACCESS_TOKEN_NAME);
-//        if (cookie == null) {
-//            throw new IllegalStateException("인증되지 않은 사용자의 websocket 연결 시도.");
-//        }
-//        log.info("JWT ACCESS TOKEN: {}", cookie.getValue());
-        return memberService.findLoginMember();
+
+        return userDetailsService.findLoginMember();
     }
 }

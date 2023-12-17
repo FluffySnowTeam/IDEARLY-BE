@@ -21,6 +21,14 @@ public class CompetitionController {
 
     private final CompetitionService competitionService;
 
+    @GetMapping("/login")
+    public Long getLoginMemberIdTest() {
+        return getLoginMemberId();
+    }
+
+    /**
+     * 메인페이지에서 대회의 리스트를 조회
+     */
     @GetMapping
     public ApiResponse<List<CompetitionResponseDto>> getCompetitionList() {
 
@@ -29,6 +37,9 @@ public class CompetitionController {
         return ApiResponse.ok(competitionResponseDtoList);
     }
 
+    /**
+     * 특정 대회의 상세정보 조회
+     */
     @GetMapping("/{competitionId}")
     public ApiResponse<CompetitionDetailResponseDto> getCompetitionDetail(@PathVariable("competitionId") Long competitionId) {
 
@@ -77,7 +88,7 @@ public class CompetitionController {
         if (authentication != null && authentication.isAuthenticated()) {
             // 인증 정보 사용
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-            loginMemberId = customUserDetails.getId();
+            loginMemberId = customUserDetails.getMemberId();
         }
         return loginMemberId;
     }

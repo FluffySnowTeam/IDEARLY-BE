@@ -1,5 +1,6 @@
 package fluffysnow.idearly.config.jwt;
 
+import fluffysnow.idearly.common.Role;
 import fluffysnow.idearly.config.CustomUserDetails;
 import fluffysnow.idearly.member.dto.TokenDto;
 import io.jsonwebtoken.*;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -47,7 +49,7 @@ public class JwtProvider {
 
         CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
 
-        log.info("ID: {}", principal.getId());
+        log.info("memberId: {}", principal.getMemberId());
 
         long now = (new Date()).getTime();
 
@@ -55,7 +57,7 @@ public class JwtProvider {
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())  // payload "sub": "email"
-                .claim("member_id", principal.getId()) // payload "member_id": "Long"
+                .claim("member_id", principal.getMemberId()) // payload "member_id": "Long"
                 .claim(AUTHORITIES_KEY, authorities)   // payload "auth": "role"
                 .setExpiration(accessTokenExpiresIn)   // payload "exp": 1516239022 (예시)
                 .signWith(private_key, SignatureAlgorithm.HS512)  // header "alg": "HS512" -> HS512: HMAC using SHA-512
@@ -97,7 +99,16 @@ public class JwtProvider {
                         .collect(Collectors.toList());
 
         // UserDetails 객체를 만들어서 Authentication 리턴
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
+//        UserDetails principal = new User(claims.getSubject(), "", authorities);
+
+        log.info("claims.get(AUTHORITIES_KEY): {}", claims.get(AUTHORITIES_KEY));
+        CustomUserDetails principal = new CustomUserDetails(
+                Long.parseLong(claims.get("member_id").toString()),
+                claims.getSubject(),
+                "",
+                "",
+                Role.valueOf(claims.get(AUTHORITIES_KEY).toString())
+        );
 
         // SecurityContext 를 사용하기 위한 절차(SecurityContext 가 Authentication 객체를 저장)
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);

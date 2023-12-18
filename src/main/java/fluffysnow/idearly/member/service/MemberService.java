@@ -112,11 +112,5 @@ public class MemberService {
                 .set(dto.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
     }
 
-    public Member findLoginMember() {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-        return memberRepository.findByEmail(userDetails.getUsername()).orElseThrow();   //userNotFound 예외
-    }
 }

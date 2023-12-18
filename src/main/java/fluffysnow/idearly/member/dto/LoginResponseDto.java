@@ -22,7 +22,7 @@ public class LoginResponseDto {
 
     public static LoginResponseDto of(CustomUserDetails customUserDetails, TokenDto tokenDto) {
         return new LoginResponseDto(
-                customUserDetails.getId(),
+                customUserDetails.getMemberId(),
                 customUserDetails.getUsername(),
                 customUserDetails.getName(),
                 tokenDto.getAccessToken(),

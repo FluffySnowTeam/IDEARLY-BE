@@ -1,5 +1,6 @@
 package fluffysnow.idearly.config;
 
+import fluffysnow.idearly.common.Role;
 import fluffysnow.idearly.member.dto.MemberRequestDto;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,40 +10,51 @@ import java.util.Collection;
 
 public class CustomUserDetails implements UserDetails {
 
-    private final MemberRequestDto memberRequestDto;
+    private Long memberId;
+    private String email;
+    private String name;
+    private String password;
+    private Collection<GrantedAuthority> authorities = new ArrayList<>();
+
+
+    public CustomUserDetails(Long memberId, String email, String name, String password, Role role) {
+        this.memberId = memberId;
+        this.email = email;
+        this.name = name;
+        this.password = password;
+        this.authorities.add((GrantedAuthority) role::toString);
+    }
 
     //일반 로그인
-    public CustomUserDetails(MemberRequestDto memberRequestDto) {
-        this.memberRequestDto = memberRequestDto;
-    }
+//    public CustomUserDetails(MemberRequestDto memberRequestDto) {
+//        this.memberRequestDto = memberRequestDto;
+//    }
 
-    public MemberRequestDto getMember() {
-        return memberRequestDto;
-    }
+//    public MemberRequestDto getMember() {
+//        return memberRequestDto;
+//    }
 
-    public Long getId() {
-        return memberRequestDto.getId();
+    public Long getMemberId() {
+        return memberId;
     }
 
     public String getName() {
-        return memberRequestDto.getName();
+        return name;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> role = new ArrayList<>();
-        role.add((GrantedAuthority) () -> memberRequestDto.getRole().toString());
-        return role;
+        return authorities;
     }
 
     @Override
     public String getPassword() {
-        return memberRequestDto.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return memberRequestDto.getEmail();
+        return email;
     }
 
     @Override

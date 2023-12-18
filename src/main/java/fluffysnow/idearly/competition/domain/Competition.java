@@ -32,4 +32,11 @@ public class Competition extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member host;
 
+    public Competition(String name, String description, LocalDateTime startDatetime, LocalDateTime endDatetime, Member host) {
+        this.name = name;
+        this.description = description;
+        this.startDatetime = startDatetime;
+        this.endDatetime = endDatetime;
+        this.host = host;
+    }
 }

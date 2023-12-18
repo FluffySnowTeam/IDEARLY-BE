@@ -39,31 +39,34 @@ public class SubmitService {
     /**
      * 코드 제출 생성 메서드
      * 제출한 team의 문제 id에 대한 제출 정보를 docker 컨테이너 내부에서 처리 후 반환값을 검증하고, 정답여부, 제출 정보를 저장한다.
+     * 여러 테스트 케이스 중 첫 세 개의 테스트 케이스만 실행하도록 합니다.
      * @param competitionId: 대회 id
      * @param problemId: 문제 id
      * @param submitCreateRequestDto: 제출한 team의 code, language를 포함한다.
      */
     @Transactional
     public SubmitResponseDto createSubmit(Long competitionId, Long problemId, SubmitCreateRequestDto submitCreateRequestDto) {
-        // memberId SecurityContextHolder에서 가져옴.
+        // memberId SecurityContextHolder에서 가져옵니다.
         Long memberId = getLoginMemberId();
 
-        // competitionId랑 memberId로 memberTeam을 가져옴.
+        // competitionId랑 memberId로 memberTeam을 가져옵니다.
         MemberTeam memberTeam = memberTeamRepository.findByMemberIdAndCompetitionId(memberId, competitionId)
                 .orElseThrow(() -> new IllegalArgumentException("대회에 참여한 팀을 찾을 수 없습니다."));
 
-        // memberTeam에서 team을 가져옴.
+        // memberTeam에서 team을 가져옵니다.
         Team team = memberTeam.getTeam();
 
         Problem problem = problemRepository.findById(problemId).orElseThrow();
 
-        List<Testcase> testcases = testcaseRepository.findByProblemId(problemId);
+        // hidden이 false인 testcase만 불러옵니다.
+        List<Testcase> limitedTestCases = testcaseRepository.findNonHiddenTestcaseByProblemId(problemId)
+                .stream().limit(3).toList();
 
         boolean isCorrect = true;
         // 결과 담을 리스트
         List<TestCaseInfo> testcaseResults = new ArrayList<>();
 
-        for (Testcase testcase : testcases) {
+        for (Testcase testcase : limitedTestCases) {
             // code, input, lnaguage  정답과 비교하는 부분은 서비스단으로 빠져야하나...?
             String executionResult = excuteDocker.executeCode(submitCreateRequestDto.getCode(), testcase.getInput(), submitCreateRequestDto.getLanguage());
 
@@ -87,12 +90,16 @@ public class SubmitService {
                 .correct(isCorrect)          // 실행결과와 비교해서 ture, false를 입력함.
                 .build();
 
-        Submit savedSubmit = submitRepository.save(submit);
+        submitRepository.save(submit);
 
         // 반환은 correct, testcaseId, status 필요.
         return SubmitResponseDto.of(isCorrect, testcaseResults);
     }
 
+    /**
+     * memberId를 SecurityContextHolder에서 가져옵니다.
+     * @return : memberId를 반환합니다.
+     */
     private static Long getLoginMemberId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long loginMemberId = null;

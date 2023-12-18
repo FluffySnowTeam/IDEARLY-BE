@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
@@ -23,5 +25,9 @@ public class TeammateResponseDto {
                 memberTeam.getMember().getEmail(),
                 memberTeam.getInviteStatus()
         );
+    }
+
+    public static List<TeammateResponseDto> listFrom(List<MemberTeam> memberTeamList) {
+        return memberTeamList.stream().map(TeammateResponseDto::from).toList();
     }
 }

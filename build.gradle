@@ -41,14 +41,17 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
-	//********************* docker java api 의존성 추가 **********************
-	implementation 'com.github.docker-java:docker-java:3.3.4'
-	implementation 'com.github.docker-java:docker-java-transport-httpclient5:3.3.4'
-	implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
-	implementation 'org.apache.httpcomponents.client5:httpclient5:5.0.3'
-	implementation 'org.apache.httpcomponents.core5:httpcore5:5.0.2'
-	implementation 'org.apache.httpcomponents.core5:httpcore5-h2:5.0.2'
-	//*********************************************************************
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+    //********************* docker java api 의존성 추가 **********************
+    implementation 'com.github.docker-java:docker-java:3.3.4'
+    implementation 'com.github.docker-java:docker-java-transport-httpclient5:3.3.4'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.0.3'
+    implementation 'org.apache.httpcomponents.core5:httpcore5:5.0.2'
+    implementation 'org.apache.httpcomponents.core5:httpcore5-h2:5.0.2'
+    //*********************************************************************
 
 }
 

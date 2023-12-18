@@ -8,6 +8,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "team")
 @Getter
@@ -29,4 +32,13 @@ public class Team extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "competition_id")
     private Competition competition;
+
+    @OneToMany(mappedBy = "team")
+    private List<MemberTeam> memberTeamList = new ArrayList<>();
+
+    public Team(String name, Member leader, Competition competition) {
+        this.name = name;
+        this.leader = leader;
+        this.competition = competition;
+    }
 }

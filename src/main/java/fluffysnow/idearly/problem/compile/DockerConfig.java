@@ -109,19 +109,17 @@ public class DockerConfig {
      * @code @return:  컨테이너 실행 결과 값을 반환합니다.
      */
     public String getContainerLogs(String containerId) {
-        StringBuilder logs = new StringBuilder();
-
-        dockerClient.logContainerCmd(containerId)
+        return dockerClient.logContainerCmd(containerId)
                 .withStdOut(true)
                 .withStdErr(true)
                 .withFollowStream(true)     // 로그가 실시간으로 생성 될때마다 새로운 로그를 가져옴.
                 .withTailAll()              // 기존에 존재하는 로그의 마지막 부분부터 로그르 가져옴.
-                .exec(new ResultCallback.Adapter<Frame>() {
+                .exec(new ResultCallback.Adapter<Frame>(){
                     @Override
                     public void onNext(Frame item) {
-                        logs.append(new String(item.getPayload()));
+                        System.out.println(new String(item.getPayload()));
                     }
-                });
-        return logs.toString();
+                })
+                .toString();
     }
 }

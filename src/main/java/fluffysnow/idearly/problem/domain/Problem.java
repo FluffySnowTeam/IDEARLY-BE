@@ -20,6 +20,8 @@ public class Problem {
     @Column(name = "problem_id")
     private Long id;
 
+    private String name;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
@@ -29,4 +31,9 @@ public class Problem {
 
     @OneToMany(mappedBy = "problem")
     private List<Testcase> testcases;
+
+    public void updateProblem(String name, String description){
+        this.name = name;
+        this.description = description;
+    }
 }

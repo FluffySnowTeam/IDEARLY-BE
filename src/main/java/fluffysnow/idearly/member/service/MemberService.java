@@ -1,6 +1,8 @@
 package fluffysnow.idearly.member.service;
 
 import fluffysnow.idearly.common.Role;
+import fluffysnow.idearly.common.exception.BadRequestException;
+import fluffysnow.idearly.common.exception.UnauthorizedException;
 import fluffysnow.idearly.config.CustomUserDetails;
 import fluffysnow.idearly.config.jwt.JwtProvider;
 import fluffysnow.idearly.member.domain.Member;
@@ -37,6 +39,7 @@ public class MemberService {
         Optional<Member> memberOptional = memberRepository.findByEmail(dto.getEmail());
         if (memberOptional.isPresent()) {
             log.info("이미 존재하는 이메일입니다."); // 에러 처리
+            throw new BadRequestException("이미 존재하는 회원의 회원가입 요청입니다.");
         }
         Member encoding = new Member(dto.getEmail(), dto.getName(), bCryptPasswordEncoder.encode(dto.getPassword()), Role.USER);
 
@@ -78,10 +81,12 @@ public class MemberService {
 
         if (ObjectUtils.isEmpty(refreshToken)) {
             log.info("잘못된 요청입니다."); //에러 처리
+            throw new UnauthorizedException("인증되지 않은 사용자의 요청입니다.");
         }
 
         if (!refreshToken.equals(dto.getRefreshToken())) {
             log.info("Refresh Token 정보 불일치"); //에러 처리
+            throw new UnauthorizedException("인증되지 않은 사용자의 요청입니다.");
         }
 
         TokenDto tokenDto = jwtProvider.createTokenDto(authentication);
@@ -96,6 +101,7 @@ public class MemberService {
     public void logout(TokenRequestDto dto) {
         if (!jwtProvider.validateToken(dto.getAccessToken())) {
             log.info("잘못된 요청입니다."); //에러 처리
+            throw new UnauthorizedException("인증되지 않은 사용자의 요청입니다.");
         }
 
         Authentication authentication = jwtProvider.getAuthentication(dto.getAccessToken());

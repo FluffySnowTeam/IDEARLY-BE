@@ -65,8 +65,7 @@ public class MemberController {
                 if ("accessToken".equals(cookie.getName())) {
                     // 기존 쿠키 수정
                     cookie.setValue(tokenDto.getAccessToken());
-                    cookie.setPath("/");
-                    cookie.setMaxAge(1000 * 60 * 60 * 3); // 쿠키의 유효 시간 설정 (초 단위)
+                    cookie.setMaxAge(60 * 60 * 3); // 쿠키의 유효 시간 설정 (초 단위)
                     response.addCookie(cookie);
                 }
             }
@@ -75,7 +74,7 @@ public class MemberController {
                     // 기존 쿠키 수정
                     cookie.setValue(tokenDto.getRefreshToken());
                     cookie.setPath("/");
-                    cookie.setMaxAge(1000 * 60 * 60 * 3); // 쿠키의 유효 시간 설정 (초 단위)
+                    cookie.setMaxAge(60 * 60 * 3); // 쿠키의 유효 시간 설정 (초 단위)
                     response.addCookie(cookie);
                 }
             }

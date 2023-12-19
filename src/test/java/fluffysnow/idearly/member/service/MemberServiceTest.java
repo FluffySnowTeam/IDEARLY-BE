@@ -47,7 +47,7 @@ class MemberServiceTest {
     void loginTest() {
         LoginRequestDto loginRequestDto = new LoginRequestDto("aaa@naver.com", "12345678");
 
-        memberService.login(loginRequestDto);
+        LoginResponseDto loginResponseDto = memberService.login(loginRequestDto);
     }
 
     @Test

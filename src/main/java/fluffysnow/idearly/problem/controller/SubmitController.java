@@ -21,7 +21,7 @@ public class SubmitController {
      * @return : 제출한 코드의 성공여부를 반환합니다.
      */
     @PostMapping("/{competitionId}/problems/{problemId}")
-    public ApiResponse<SubmitResponseDto> submitcode(@PathVariable Long competitionId, @PathVariable Long problemId, @RequestBody SubmitCreateRequestDto submitCreateRequestDto) {
+    public ApiResponse<SubmitResponseDto> submitcode(@PathVariable("competitionId") Long competitionId, @PathVariable("problemId") Long problemId, @RequestBody SubmitCreateRequestDto submitCreateRequestDto) {
         SubmitResponseDto submit = submitService.createSubmit(competitionId, problemId, submitCreateRequestDto);
 
         return ApiResponse.ok(submit);

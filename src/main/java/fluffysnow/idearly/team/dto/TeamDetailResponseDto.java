@@ -19,6 +19,7 @@ public class TeamDetailResponseDto {
     private Long competitionId;
     private String competitionTitle;
     private String leaderName;
+    private String leaderEmail;
     private List<TeammateResponseDto> teammates;
 
     public static TeamDetailResponseDto from(Team team) {
@@ -29,6 +30,7 @@ public class TeamDetailResponseDto {
                 team.getCompetition().getId(),
                 team.getCompetition().getName(),
                 team.getLeader().getName(),
+                team.getLeader().getEmail(),
                 TeammateResponseDto.listFrom(team.getMemberTeamList())
         );
     }

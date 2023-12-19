@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -18,7 +19,10 @@ public class TeamResponseDto {
     private String teamName;
     private Long competitionId;
     private String competitionTitle;
+    private LocalDateTime startDateTime;
+    private LocalDateTime endDateTime;
     private String leaderName;
+    private String leaderEmail;
 
     private static TeamResponseDto from(Team team) {
 
@@ -27,7 +31,10 @@ public class TeamResponseDto {
                 team.getName(),
                 team.getCompetition().getId(),
                 team.getCompetition().getName(),
-                team.getLeader().getName()
+                team.getCompetition().getStartDatetime(),
+                team.getCompetition().getEndDatetime(),
+                team.getLeader().getName(),
+                team.getLeader().getEmail()
         );
     }
 

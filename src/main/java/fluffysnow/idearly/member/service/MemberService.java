@@ -12,8 +12,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,5 +110,8 @@ public class MemberService {
                 .set(dto.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
     }
 
-
+    public MemberDuplicateCheckResponseDto duplicateCheck(String email) {
+        boolean duplicate = memberRepository.findByEmail(email).isPresent();
+        return MemberDuplicateCheckResponseDto.from(duplicate);
+    }
 }

@@ -24,6 +24,12 @@ public class MemberController {
         return "ok";
     }
 
+    @GetMapping("/signup/email-check")
+    public ApiResponse<MemberDuplicateCheckResponseDto> emailCheck(@RequestParam("email") String email) {
+        MemberDuplicateCheckResponseDto responseDto = memberService.duplicateCheck(email);
+        return ApiResponse.ok(responseDto);
+    }
+
     @PostMapping("/signup")
     public ApiResponse<SignupResponseDto> createUser(@RequestBody MemberCreateRequestDto dto) {
         SignupResponseDto response = memberService.createUser(dto);
@@ -35,12 +41,12 @@ public class MemberController {
         LoginResponseDto loginResponseDto = memberService.login(loginRequestDto);
         Cookie cookie = new Cookie("accessToken", loginResponseDto.getAccessToken());
         cookie.setPath("/");
-        cookie.setMaxAge(1000 * 60 * 60 * 3); // 액세스 토큰: 3시간
+        cookie.setMaxAge(60 * 60 * 3); // 액세스 토큰: 3시간
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
         Cookie c = new Cookie("refreshToken", loginResponseDto.getRefreshToken());
         c.setPath("/");
-        c.setMaxAge(1000 * 60 * 60 * 3); // 리프레쉬 토큰: 3시간
+        c.setMaxAge(60 * 60 * 3); // 리프레쉬 토큰: 3시간
         response.addCookie(cookie);
         response.addCookie(c);
         c.setSecure(true);
@@ -59,8 +65,7 @@ public class MemberController {
                 if ("accessToken".equals(cookie.getName())) {
                     // 기존 쿠키 수정
                     cookie.setValue(tokenDto.getAccessToken());
-                    cookie.setPath("/");
-                    cookie.setMaxAge(1000 * 60 * 60 * 3); // 쿠키의 유효 시간 설정 (초 단위)
+                    cookie.setMaxAge(60 * 60 * 3); // 쿠키의 유효 시간 설정 (초 단위)
                     response.addCookie(cookie);
                 }
             }
@@ -69,7 +74,7 @@ public class MemberController {
                     // 기존 쿠키 수정
                     cookie.setValue(tokenDto.getRefreshToken());
                     cookie.setPath("/");
-                    cookie.setMaxAge(1000 * 60 * 60 * 3); // 쿠키의 유효 시간 설정 (초 단위)
+                    cookie.setMaxAge(60 * 60 * 3); // 쿠키의 유효 시간 설정 (초 단위)
                     response.addCookie(cookie);
                 }
             }

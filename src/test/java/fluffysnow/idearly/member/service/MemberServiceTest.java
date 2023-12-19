@@ -1,11 +1,11 @@
 package fluffysnow.idearly.member.service;
 
 import fluffysnow.idearly.member.domain.Member;
-import fluffysnow.idearly.member.dto.LoginRequestDto;
-import fluffysnow.idearly.member.dto.MemberCreateRequestDto;
-import fluffysnow.idearly.member.dto.SignupResponseDto;
-import fluffysnow.idearly.member.dto.TokenDto;
+import fluffysnow.idearly.member.dto.*;
+import fluffysnow.idearly.member.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,29 +21,41 @@ class MemberServiceTest {
     @Autowired
     private MemberService memberService;
 
-    @Test
-    void createUserTest() {
+    @Autowired
+    private MemberRepository memberRepository;
 
-        MemberCreateRequestDto dto = new MemberCreateRequestDto("aaa@naver.com", "Gwan", "123");
-        MemberCreateRequestDto memberDto = new MemberCreateRequestDto("aaa@naver.com", "ssss", "123");
-
-
-        memberService.createUser(memberDto);
-        SignupResponseDto response = memberService.createUser(dto);
-
-        assertNotNull(response);
-        assertEquals(dto.getName(), response.getName());
-        assertEquals(dto.getEmail(), response.getEmail());
+    @BeforeEach
+    void beforeEach() {
+        MemberCreateRequestDto dto = new MemberCreateRequestDto("aaa@naver.com", "정관휘", "12345678");
+        memberService.createUser(dto);
     }
 
     @Test
+    @DisplayName("회원가입")
+    void createUserTest() {
+        MemberCreateRequestDto memberCreateRequestDto = new MemberCreateRequestDto("aaa@naver.com", "정관휘", "12345678");
+        Member member = memberRepository.findByEmail("aaa@naver.com").orElseThrow(); // 오류 출력
+
+        assertNotNull(member);
+        assertEquals(member.getName(), memberCreateRequestDto.getName());
+        assertEquals(member.getEmail(), memberCreateRequestDto.getEmail());
+    }
+
+    @Test
+    @DisplayName("로그인")
     void loginTest() {
-        MemberCreateRequestDto dto = new MemberCreateRequestDto("aaa@naver.com", "Gwan", "123");
+        LoginRequestDto loginRequestDto = new LoginRequestDto("aaa@naver.com", "12345678");
 
-        memberService.createUser(dto);
+        LoginResponseDto loginResponseDto = memberService.login(loginRequestDto);
+    }
 
-        LoginRequestDto loginRequestDto = new LoginRequestDto("aaa@naver.com", "123");
+    @Test
+    @DisplayName("아이디 중복 체크")
+    void duplicateCheckTest() {
+        String email = "aaa@naver.com";
 
-        memberService.login(loginRequestDto);
+        MemberDuplicateCheckResponseDto memberDuplicateCheckResponseDto = memberService.duplicateCheck(email);
+
+        assertTrue(memberDuplicateCheckResponseDto.isDuplicate());
     }
 }

@@ -24,6 +24,12 @@ public class MemberController {
         return "ok";
     }
 
+    @PostMapping("/signup/emailCheck")
+    public ApiResponse<MemberDuplicateCheckResponseDto> emailCheck(@RequestBody MemberDuplicateCheckRequestDto requestDto) {
+        MemberDuplicateCheckResponseDto responseDto = memberService.duplicateCheck(requestDto);
+        return ApiResponse.ok(responseDto);
+    }
+
     @PostMapping("/signup")
     public ApiResponse<SignupResponseDto> createUser(@RequestBody MemberCreateRequestDto dto) {
         SignupResponseDto response = memberService.createUser(dto);
@@ -35,12 +41,12 @@ public class MemberController {
         LoginResponseDto loginResponseDto = memberService.login(loginRequestDto);
         Cookie cookie = new Cookie("accessToken", loginResponseDto.getAccessToken());
         cookie.setPath("/");
-        cookie.setMaxAge(1000 * 60 * 60 * 3); // 액세스 토큰: 3시간
+        cookie.setMaxAge(60 * 60 * 3); // 액세스 토큰: 3시간
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
         Cookie c = new Cookie("refreshToken", loginResponseDto.getRefreshToken());
         c.setPath("/");
-        c.setMaxAge(1000 * 60 * 60 * 3); // 리프레쉬 토큰: 3시간
+        c.setMaxAge(60 * 60 * 3); // 리프레쉬 토큰: 3시간
         response.addCookie(cookie);
         response.addCookie(c);
         c.setSecure(true);

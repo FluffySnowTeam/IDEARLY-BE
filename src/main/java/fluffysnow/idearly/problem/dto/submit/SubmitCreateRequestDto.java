@@ -12,4 +12,8 @@ import lombok.NoArgsConstructor;
 public class SubmitCreateRequestDto {
     private String code;
     private Language language;
+
+    public static SubmitCreateRequestDto of(String code, Language language) {
+        return new SubmitCreateRequestDto(code, language);
+    }
 }

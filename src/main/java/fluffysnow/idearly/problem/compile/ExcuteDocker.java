@@ -4,6 +4,8 @@ import fluffysnow.idearly.common.Language;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.TimeUnit;
+
 @Component
 @Slf4j
 public class ExcuteDocker {
@@ -12,7 +14,7 @@ public class ExcuteDocker {
      * @param code: 제출 코드
      * @param input: 하나의 테스트
      * @param language: 제출된 언어
-     * @return 도커 컨테이너에서 실행된 컴파일된 값(결과 값)을 반환 합니다.
+     * @return : 도커 컨테이너에서 실행된 컴파일된 값(결과 값)을 반환 합니다.
      */
     public String executeCode(String code, String input, Language language) {
         DockerConfig dockerConfig = new DockerConfig();
@@ -20,15 +22,20 @@ public class ExcuteDocker {
         String excutableCode = combineCodeAndInput(code, input, language);
 
         // 도커 컨테이너 생성 및 실행
+        // 도커 컨테이너 실행 및 타임 아웃 처리 로직
         String containerId = dockerConfig.createContainer(excutableCode, iamgeName, language);
-        dockerConfig.startContainer(containerId);
-
-        String result = dockerConfig.getContainerLogs(containerId);
-        dockerConfig.stopAndRemoveContainer(containerId);
-
-        return result;
+        return executeContainerAndHandleExceptions(dockerConfig, containerId);
     }
 
+
+    private String executeContainerAndHandleExceptions(DockerConfig dockerConfig, String containerId) {
+        try {
+            return dockerConfig.executeContainerWithTimeout(containerId, 8, TimeUnit.SECONDS);
+        } catch (RuntimeException e) {
+            log.error("excuteCode 실행 중 오류 발생 : {}", e.getMessage());
+            return e.getMessage();
+        }
+    }
 
     /**
      * 제출한 코드의 언어에 맞는 docker image 이름으로 변환 해주는 메서드

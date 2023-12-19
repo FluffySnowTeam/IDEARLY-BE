@@ -15,6 +15,7 @@ import fluffysnow.idearly.team.domain.MemberTeam;
 import fluffysnow.idearly.team.domain.Team;
 import fluffysnow.idearly.team.repository.MemberTeamRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SubmitService {
     private final SubmitRepository submitRepository;
 
@@ -46,7 +48,7 @@ public class SubmitService {
      */
     @Transactional
     public SubmitResponseDto createSubmit(Long competitionId, Long problemId, SubmitCreateRequestDto submitCreateRequestDto) {
-        // memberId SecurityContextHolder에서 가져옵니다.
+        // memberId SecurityContextHolder에서 가져옵니다
         Long memberId = getLoginMemberId();
 
         // competitionId랑 memberId로 memberTeam을 가져옵니다.
@@ -58,27 +60,40 @@ public class SubmitService {
 
         Problem problem = problemRepository.findById(problemId).orElseThrow();
 
-        // hidden이 false인 testcase만 불러옵니다.
-        List<Testcase> limitedTestCases = testcaseRepository.findNonHiddenTestcaseByProblemId(problemId)
-                .stream().limit(3).toList();
+        // problemId에 해당한 전체 testCase를 불러옵니다.
+        List<Testcase> limitedTestCases = testcaseRepository.findTestCaseByProblemId(problemId)
+                .stream().toList();
 
         boolean isCorrect = true;
         // 결과 담을 리스트
         List<TestCaseInfo> testcaseResults = new ArrayList<>();
 
         for (Testcase testcase : limitedTestCases) {
-            // code, input, lnaguage  정답과 비교하는 부분은 서비스단으로 빠져야하나...?
             String executionResult = excuteDocker.executeCode(submitCreateRequestDto.getCode(), testcase.getInput(), submitCreateRequestDto.getLanguage());
+            log.info("createSubmit 실행 결과 출력 {}", executionResult);
 
-            // 결과 검증 부분 필요.
-            // 수정: error, timeout 로직 필요.
-            String testcaseStatus = executionResult.equals(testcase.getAnswer()) ? "pass" : "failed";
-            testcaseResults.add(TestCaseInfo.of(testcase.getId(), testcaseStatus));
 
-            if (!testcaseStatus.equals("pass")) {
+            // 타임아웃 처리
+            if (executionResult.equals("Timeout")) {
+                testcaseResults.add(TestCaseInfo.of(testcase.getId(), "timeout"));
                 isCorrect = false;
-            }
 
+            } else if (executionResult.startsWith("Error detected:")) {
+                // 파이썬 컴파일 에러
+                testcaseResults.add(TestCaseInfo.of(testcase.getId(), "error"));
+                isCorrect = false;
+            } else if (executionResult.startsWith("Error:")) {
+                // 도커 컨테이너 에러
+                testcaseResults.add(TestCaseInfo.of(testcase.getId(), "error"));
+                isCorrect = false;
+            } else {
+                // pass, failed 처리
+                String testcaseStatus = executionResult.equals(testcase.getAnswer()) ? "pass" : "failed";
+                testcaseResults.add(TestCaseInfo.of(testcase.getId(), testcaseStatus));
+                if (!testcaseStatus.equals("pass")) {
+                    isCorrect = false;
+                }
+            }
         }
 
         // 제출정보를 생성

@@ -1,7 +1,7 @@
-package fluffysnow.idearly.common.exception;
+package fluffysnow.idearly.common;
 
 
-import fluffysnow.idearly.common.ApiResponse;
+import fluffysnow.idearly.common.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;

@@ -110,8 +110,8 @@ public class MemberService {
                 .set(dto.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
     }
 
-    public MemberDuplicateCheckResponseDto duplicateCheck(MemberDuplicateCheckRequestDto duplicateCheckRequestDto) {
-        boolean tf = memberRepository.findByEmail(duplicateCheckRequestDto.getEmail()).isPresent();
-        return MemberDuplicateCheckResponseDto.from(tf);
+    public MemberDuplicateCheckResponseDto duplicateCheck(String email) {
+        boolean duplicate = memberRepository.findByEmail(email).isPresent();
+        return MemberDuplicateCheckResponseDto.from(duplicate);
     }
 }

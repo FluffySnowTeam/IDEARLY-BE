@@ -24,9 +24,9 @@ public class MemberController {
         return "ok";
     }
 
-    @PostMapping("/signup/emailCheck")
-    public ApiResponse<MemberDuplicateCheckResponseDto> emailCheck(@RequestBody MemberDuplicateCheckRequestDto requestDto) {
-        MemberDuplicateCheckResponseDto responseDto = memberService.duplicateCheck(requestDto);
+    @GetMapping("/signup/email-check")
+    public ApiResponse<MemberDuplicateCheckResponseDto> emailCheck(@RequestParam("email") String email) {
+        MemberDuplicateCheckResponseDto responseDto = memberService.duplicateCheck(email);
         return ApiResponse.ok(responseDto);
     }
 

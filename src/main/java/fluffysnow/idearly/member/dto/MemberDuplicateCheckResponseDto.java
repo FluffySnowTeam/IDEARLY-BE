@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class MemberDuplicateCheckResponseDto {
-    private boolean tf;
+    private boolean duplicate;
 
-    public static MemberDuplicateCheckResponseDto from(boolean tf) {
-        return new MemberDuplicateCheckResponseDto(tf);
+    public static MemberDuplicateCheckResponseDto from(boolean duplicate) {
+        return new MemberDuplicateCheckResponseDto(duplicate);
     }
 }

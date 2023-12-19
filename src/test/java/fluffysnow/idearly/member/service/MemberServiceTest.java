@@ -52,10 +52,10 @@ class MemberServiceTest {
     @Test
     @DisplayName("아이디 중복 체크")
     void duplicateCheckTest() {
-        MemberDuplicateCheckRequestDto duplicateCheckRequestDto = new MemberDuplicateCheckRequestDto("aaa@naver.com");
+        String email = "aaa@naver.com";
 
-        MemberDuplicateCheckResponseDto memberDuplicateCheckResponseDto = memberService.duplicateCheck(duplicateCheckRequestDto);
+        MemberDuplicateCheckResponseDto memberDuplicateCheckResponseDto = memberService.duplicateCheck(email);
 
-        assertTrue(memberDuplicateCheckResponseDto.isTf());
+        assertTrue(memberDuplicateCheckResponseDto.isDuplicate());
     }
 }

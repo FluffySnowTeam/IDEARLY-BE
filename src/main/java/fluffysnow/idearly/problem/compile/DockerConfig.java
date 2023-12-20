@@ -6,15 +6,15 @@ import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.PullImageResultCallback;
 import com.github.dockerjava.api.exception.NotModifiedException;
 import com.github.dockerjava.api.model.Frame;
+import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
-import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
+import com.github.dockerjava.okhttp.OkDockerHttpClient;
 import com.github.dockerjava.transport.DockerHttpClient;
 import fluffysnow.idearly.common.Language;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.Duration;
 import java.util.concurrent.*;
 
 @Slf4j
@@ -22,15 +22,15 @@ public class DockerConfig {
     private final DockerClient dockerClient;
 
     public DockerConfig() {
+
         // docker 클라이언트 생성
         DockerClientConfig standard = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
 
-        DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
+
+        DockerHttpClient httpClient = new OkDockerHttpClient.Builder()
                 .dockerHost(standard.getDockerHost())       // 호스트 설정
                 .sslConfig(standard.getSSLConfig())
-                .maxConnections(100)                  // 최대 동시 연결 수 설정
-                .connectionTimeout(Duration.ofSeconds(30))  // 연결 시도 타임아웃 최대 30초 설정
-                .responseTimeout(Duration.ofSeconds(30))    // 응답 대기 시간 30초 설정
+//                .connectTimeout(100)                  // 최대 동시 연결 수 설정
                 .build();
 
         this.dockerClient = DockerClientImpl.getInstance(standard, httpClient);
@@ -59,15 +59,27 @@ public class DockerConfig {
      * @return : 생성된 컨테이너 아이디를 반환합니다.
      */
     public String createContainer(String excutableCode, String imageName, Language language) {
+        HostConfig hostConfig = new HostConfig()
+                .withAutoRemove(true)
+                .withNetworkMode("host");
+
         // 이미지를 받아옵니다.
         pullImage(imageName);
 
         String[] command = getCommandForLanguage(excutableCode, language);
+        log.info("커맨드 생성 완료: {}", command.toString());
         // 도커 컨테이너 생성합니다.
-        CreateContainerResponse container = dockerClient.createContainerCmd(imageName)
-                .withCmd(command)
-                .exec();
-
+        log.info("도커 명령어 실행");
+        CreateContainerResponse container = null;
+        try {
+            container = dockerClient.createContainerCmd(imageName)
+                    .withHostConfig(hostConfig)
+                    .withCmd(command)
+                    .exec();
+        } catch (Exception e) {
+            log.error("e", e);
+        }
+        log.info("커맨드 실행 완료");
         log.trace("도커 컨테이너 생성 container id = {}", container.getId());
         return container.getId();
     }
@@ -122,6 +134,7 @@ public class DockerConfig {
      * @code @return:  컨테이너 실행 결과 값을 반환합니다.
      */
     public String getContainerLogs(String containerId) {
+        log.info("로그 컨테이너 생성 직전");
         StringBuilder resultLogBuilder = new StringBuilder();
         try {
             dockerClient.logContainerCmd(containerId)
@@ -140,7 +153,7 @@ public class DockerConfig {
             throw new RuntimeException(e);
         }
         String result = resultLogBuilder.toString();
-
+        log.info("로그 컨테이너 출력 결과 {}", result);
 
         // 컴파일 에러 처리 부분(임시)
         if (result.contains("Error")) {
@@ -163,6 +176,7 @@ public class DockerConfig {
      * @return : 실행 결과를 반환 합니다.
      */
     public String executeContainerWithTimeout(String containerId, long timeout, TimeUnit timeUnit){
+        log.info("커맨드 실행 직전");
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<String> future = executor.submit(() -> {
             startContainer(containerId);
@@ -176,6 +190,7 @@ public class DockerConfig {
         } catch (TimeoutException e) {
             // 시간 초과 발생
             log.error("excuteContainerwithTimeout 컨테이너 실행 타임아웃: {} {}", containerId, e.getMessage());
+            stopAndRemoveContainer(containerId);
             return "Timeout";
 
         } catch (ExecutionException | InterruptedException e) {
@@ -183,7 +198,6 @@ public class DockerConfig {
             throw new RuntimeException("Error:" + e.getMessage());
 
         } finally {
-            stopAndRemoveContainer(containerId);
             executor.shutdown();
         }
     }

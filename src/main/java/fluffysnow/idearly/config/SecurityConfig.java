@@ -1,12 +1,13 @@
 package fluffysnow.idearly.config;
 
+import fluffysnow.idearly.common.handler.CustomAccessdeniedHandler;
+import fluffysnow.idearly.common.handler.CustomAuthenticationEntryPoint;
 import fluffysnow.idearly.config.jwt.JwtFilter;
 import fluffysnow.idearly.config.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -30,6 +31,10 @@ public class SecurityConfig {
 
     private final RedisTemplate<String, String> redisTemplate;
 
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    private final CustomAccessdeniedHandler customAccessdeniedHandler;
+
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web
@@ -42,7 +47,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
+                .cors(configurer -> configurer.configurationSource(corsConfigurationSource()))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http
                 .authorizeHttpRequests(authorize -> authorize
@@ -52,6 +57,8 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new JwtFilter(jwtProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
+        http    .exceptionHandling(configurer -> configurer.authenticationEntryPoint(customAuthenticationEntryPoint)
+                .accessDeniedHandler(customAccessdeniedHandler));
         return http.build();
     }
 

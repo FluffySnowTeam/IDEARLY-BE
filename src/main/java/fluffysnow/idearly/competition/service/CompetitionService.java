@@ -1,6 +1,7 @@
 package fluffysnow.idearly.competition.service;
 
 
+import fluffysnow.idearly.common.exception.NotFoundException;
 import fluffysnow.idearly.competition.domain.Competition;
 import fluffysnow.idearly.competition.dto.*;
 import fluffysnow.idearly.competition.repository.CompetitionRepository;
@@ -47,10 +48,10 @@ public class CompetitionService {
     public CompetitionDetailResponseDto getCompetitionDetail(Long competitionId, Long loginMemberId) {
 
         if (loginMemberId == null) {
-            Competition findCompetition = competitionRepository.findById(competitionId).orElseThrow();  //notFound
+            Competition findCompetition = competitionRepository.findById(competitionId).orElseThrow(() -> new NotFoundException("존재하지 않는 대회입니다."));  //notFound
             return CompetitionDetailResponseDto.of(findCompetition, false, null);
         } else {
-            Competition findCompetition = competitionRepository.findById(competitionId).orElseThrow();  //notFound
+            Competition findCompetition = competitionRepository.findById(competitionId).orElseThrow(() -> new NotFoundException("존재하지 않는 대회입니다."));  //notFound
             MemberTeam memberTeam = memberTeamRepository.findByMemberIdAndCompetitionId(loginMemberId, competitionId).orElse(null);
             return CompetitionDetailResponseDto.of(findCompetition, true, memberTeam);
         }
@@ -62,8 +63,8 @@ public class CompetitionService {
     public CompetitionParticipateResponseDto participateInCompetition(Long competitionId, CompetitionParticipateRequestDto requestDto, Long loginMemberId) {
 
         // 대회와 회원 정보 조회
-        Competition competition = competitionRepository.findById(competitionId).orElseThrow();  //notFound
-        Member loginMember = memberRepository.findById(loginMemberId).orElseThrow();    //notFound
+        Competition competition = competitionRepository.findById(competitionId).orElseThrow(() -> new NotFoundException("존재하지 않는 대회입니다."));  //notFound
+        Member loginMember = memberRepository.findById(loginMemberId).orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));    //notFound
         String teamName = requestDto.getTeamName();
 
         // 초대할 팀원의 이메일을 기준으로 팀원 리스트 생성
@@ -71,7 +72,9 @@ public class CompetitionService {
                 .getTeammates()
                 .stream()
                 .map(TeammateRequestDto::getEmail)
-                .map(email -> memberRepository.findByEmail(email).orElseThrow()).toList();  //notFound
+                .map(email -> memberRepository.findByEmail(email)
+                        .orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다.")))
+                .toList();  //notFound
 
         // 위 정보를 기준으로 팀 생성
         Team team = teamService.createTeam(competition, loginMember, teamName, teammates);

@@ -85,7 +85,8 @@ public class CompetitionController {
     private static Long getLoginMemberId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long loginMemberId = null;
-        if (authentication != null && authentication.isAuthenticated()) {
+
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
             // 인증 정보 사용
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
             loginMemberId = customUserDetails.getMemberId();

@@ -7,7 +7,7 @@ import fluffysnow.idearly.problem.domain.Submit;
 import fluffysnow.idearly.problem.domain.Testcase;
 import fluffysnow.idearly.problem.dto.submit.SubmitAndTestcaseCreateRequestDto;
 import fluffysnow.idearly.problem.dto.submit.SubmitResponseDto;
-import fluffysnow.idearly.problem.dto.submit.SumbitTestCaseInfo;
+import fluffysnow.idearly.problem.dto.submit.SubmitTestCaseInfo;
 import fluffysnow.idearly.problem.repository.ProblemRepository;
 import fluffysnow.idearly.problem.repository.SubmitRepository;
 import fluffysnow.idearly.problem.repository.TestcaseRepository;
@@ -61,12 +61,11 @@ public class SubmitService {
         Problem problem = problemRepository.findById(problemId).orElseThrow();
 
         // problemId에 해당한 전체 testCase를 불러옵니다.
-        List<Testcase> limitedTestCases = testcaseRepository.findTestCaseByProblemId(problemId)
-                .stream().toList();
+        List<Testcase> limitedTestCases = testcaseRepository.findTestCaseByProblemId(problemId);
 
         boolean isCorrect = true;
         // 결과 담을 리스트
-        List<SumbitTestCaseInfo> testcaseResults = new ArrayList<>();
+        List<SubmitTestCaseInfo> testcaseResults = new ArrayList<>();
 
         for (Testcase testcase : limitedTestCases) {
             String executionResult = executeDocker.executeCode(submitAndTestcaseCreateRequestDto.getCode(), testcase.getInput(), submitAndTestcaseCreateRequestDto.getLanguage());
@@ -75,21 +74,21 @@ public class SubmitService {
 
             // 타임아웃 처리
             if (executionResult.equals("Timeout")) {
-                testcaseResults.add(SumbitTestCaseInfo.of(testcase.getId(), "timeout"));
+                testcaseResults.add(SubmitTestCaseInfo.of(testcase.getId(), "timeout"));
                 isCorrect = false;
 
             } else if (executionResult.startsWith("Error detected:")) {
                 // 파이썬 컴파일 에러
-                testcaseResults.add(SumbitTestCaseInfo.of(testcase.getId(), "error"));
+                testcaseResults.add(SubmitTestCaseInfo.of(testcase.getId(), "error"));
                 isCorrect = false;
             } else if (executionResult.startsWith("Error:")) {
                 // 도커 컨테이너 에러
-                testcaseResults.add(SumbitTestCaseInfo.of(testcase.getId(), "error"));
+                testcaseResults.add(SubmitTestCaseInfo.of(testcase.getId(), "error"));
                 isCorrect = false;
             } else {
                 // pass, failed 처리
                 String testcaseStatus = executionResult.equals(testcase.getAnswer()) ? "pass" : "failed";
-                testcaseResults.add(SumbitTestCaseInfo.of(testcase.getId(), testcaseStatus));
+                testcaseResults.add(SubmitTestCaseInfo.of(testcase.getId(), testcaseStatus));
                 if (!testcaseStatus.equals("pass")) {
                     isCorrect = false;
                 }

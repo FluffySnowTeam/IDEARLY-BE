@@ -56,8 +56,7 @@ public class TestcaseService {
         Problem problem = problemRepository.findById(problemId).orElseThrow();
 
         // problemId에 hidden이 false인 테스트 케이스만 가져옵니다.
-        List<Testcase> limitedTestCases = testcaseRepository.findTestCaseByProblemId(problemId)
-                .stream().toList();
+        List<Testcase> limitedTestCases = testcaseRepository.findNonHiddenTestcaseByProblemId(problemId);
 
         boolean isCorrect = true;
         // 결과 담을 리스트

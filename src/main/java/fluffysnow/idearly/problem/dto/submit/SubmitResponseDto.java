@@ -12,10 +12,10 @@ import java.util.List;
 @Getter
 public class SubmitResponseDto {
     private boolean correct;
-    private List<SumbitTestCaseInfo> testcases;
+    private List<SubmitTestCaseInfo> testcases;
 
     // 정적 팩토리 메서드로 해당 Dto를 생성합니다.
-    public static SubmitResponseDto of(boolean correct, List<SumbitTestCaseInfo> testcases) {
+    public static SubmitResponseDto of(boolean correct, List<SubmitTestCaseInfo> testcases) {
         return new SubmitResponseDto(correct, testcases);
     }
 }

@@ -30,7 +30,6 @@ public class DockerConfig {
         DockerHttpClient httpClient = new OkDockerHttpClient.Builder()
                 .dockerHost(standard.getDockerHost())       // 호스트 설정
                 .sslConfig(standard.getSSLConfig())
-//                .connectTimeout(100)                  // 최대 동시 연결 수 설정
                 .build();
 
         this.dockerClient = DockerClientImpl.getInstance(standard, httpClient);
@@ -60,12 +59,11 @@ public class DockerConfig {
      */
     public String createContainer(String excutableCode, String imageName, Language language) {
         HostConfig hostConfig = new HostConfig()
-                .withAutoRemove(true)
-                .withNetworkMode("host");
+                .withAutoRemove(true); // 컨테이너가 종료되면 자동으로 삭제합니다.
 
         // 이미지를 받아옵니다.
         pullImage(imageName);
-
+        log.info("이미지 풀 완료: {}", imageName);
         String[] command = getCommandForLanguage(excutableCode, language);
         log.info("커맨드 생성 완료: {}", command.toString());
         // 도커 컨테이너 생성합니다.
@@ -182,7 +180,7 @@ public class DockerConfig {
             startContainer(containerId);
             return getContainerLogs(containerId);
         });
-
+        log.info("커맨드 실행 완료");
         try {
             // Future 객체를 사용해 지정된 시간 동안 컨테이너 로그를 기다림.
             return future.get(timeout, timeUnit);
@@ -190,7 +188,11 @@ public class DockerConfig {
         } catch (TimeoutException e) {
             // 시간 초과 발생
             log.error("excuteContainerwithTimeout 컨테이너 실행 타임아웃: {} {}", containerId, e.getMessage());
-            stopAndRemoveContainer(containerId);
+            try {
+                stopAndRemoveContainer(containerId);
+            } catch (Exception ex) {
+                log.error("excuteContainerwithTimeout 컨테이너 중지 및 삭제 중 오류 발생 : {} {}", containerId, ex.getMessage());
+            }
             return "Timeout";
 
         } catch (ExecutionException | InterruptedException e) {

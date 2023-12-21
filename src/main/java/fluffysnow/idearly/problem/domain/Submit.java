@@ -27,6 +27,7 @@ public class Submit extends BaseEntity {
     private boolean correct;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR")
     private Language language;
 
     @ManyToOne(fetch = FetchType.LAZY)

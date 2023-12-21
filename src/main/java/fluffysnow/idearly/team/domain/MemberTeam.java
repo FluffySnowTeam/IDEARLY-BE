@@ -27,6 +27,7 @@ public class MemberTeam {
     private Team team;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR")
     private InviteStatus inviteStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)

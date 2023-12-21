@@ -39,24 +39,26 @@ public class MemberController {
     @PostMapping("/login")
     public ApiResponse<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         LoginResponseDto loginResponseDto = memberService.login(loginRequestDto);
-        Cookie cookie = new Cookie("accessToken", loginResponseDto.getAccessToken());
-        cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 3); // 액세스 토큰: 3시간
-        cookie.setSecure(true);
-        cookie.setHttpOnly(true);
-        Cookie c = new Cookie("refreshToken", loginResponseDto.getRefreshToken());
-        c.setPath("/");
-        c.setMaxAge(60 * 60 * 3); // 리프레쉬 토큰: 3시간
-        response.addCookie(cookie);
-        response.addCookie(c);
-        c.setSecure(true);
-        c.setHttpOnly(true);
+        Cookie accessTokenCookie = new Cookie("accessToken", loginResponseDto.getAccessToken());
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(60 * 60 * 3); // 액세스 토큰: 3시간
+        accessTokenCookie.setSecure(true);
+        accessTokenCookie.setHttpOnly(true);
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", loginResponseDto.getRefreshToken());
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(60 * 60 * 3); // 리프레쉬 토큰: 3시간
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setHttpOnly(true);
+
+        response.addCookie(accessTokenCookie);
+        response.addCookie(refreshTokenCookie);
 
         return ApiResponse.ok(loginResponseDto);
     }
 
     @PostMapping("/reissue")
-    public ApiResponse<Void> reissue(@CookieValue String accessToken, @CookieValue String refreshToken, HttpServletRequest request, HttpServletResponse response) {
+    public ApiResponse<Void> reissue(@CookieValue("accessToken") String accessToken, @CookieValue("refreshToken") String refreshToken, HttpServletRequest request, HttpServletResponse response) {
         TokenRequestDto tokenRequestDto = new TokenRequestDto(accessToken, refreshToken);
         TokenDto tokenDto = memberService.reissue(tokenRequestDto);
         Cookie[] cookies = request.getCookies();
@@ -83,7 +85,7 @@ public class MemberController {
     }
 
     @PostMapping("/logout")
-    public ApiResponse<Void> logout(@CookieValue String accessToken, @CookieValue String refreshToken) {
+    public ApiResponse<Void> logout(@CookieValue("accessToken") String accessToken, @CookieValue("refreshToken") String refreshToken) {
         TokenRequestDto tokenRequestDto = new TokenRequestDto(accessToken, refreshToken);
         memberService.logout(tokenRequestDto);
         return ApiResponse.ok(null);

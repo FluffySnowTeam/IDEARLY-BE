@@ -25,7 +25,7 @@ public class Problem {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @JoinColumn(name = "competitionId")
+    @JoinColumn(name = "competition_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Competition competition;
 

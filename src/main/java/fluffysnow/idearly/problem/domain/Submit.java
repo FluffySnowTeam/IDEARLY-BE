@@ -4,13 +4,14 @@ import fluffysnow.idearly.common.BaseEntity;
 import fluffysnow.idearly.common.Language;
 import fluffysnow.idearly.team.domain.Team;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
 @Entity
 @Table(name = "submit")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class Submit extends BaseEntity {
 
@@ -35,4 +36,5 @@ public class Submit extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "problem_id")
     private Problem problem;
+
 }

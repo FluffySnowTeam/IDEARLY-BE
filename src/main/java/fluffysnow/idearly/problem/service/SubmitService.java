@@ -5,9 +5,9 @@ import fluffysnow.idearly.problem.compile.ExecuteDocker;
 import fluffysnow.idearly.problem.domain.Problem;
 import fluffysnow.idearly.problem.domain.Submit;
 import fluffysnow.idearly.problem.domain.Testcase;
-import fluffysnow.idearly.problem.dto.submit.SubmitCreateRequestDto;
+import fluffysnow.idearly.problem.dto.submit.SubmitAndTestcaseCreateRequestDto;
 import fluffysnow.idearly.problem.dto.submit.SubmitResponseDto;
-import fluffysnow.idearly.problem.dto.submit.TestCaseInfo;
+import fluffysnow.idearly.problem.dto.submit.SumbitTestCaseInfo;
 import fluffysnow.idearly.problem.repository.ProblemRepository;
 import fluffysnow.idearly.problem.repository.SubmitRepository;
 import fluffysnow.idearly.problem.repository.TestcaseRepository;
@@ -44,10 +44,10 @@ public class SubmitService {
      * 여러 테스트 케이스 중 첫 세 개의 테스트 케이스만 실행하도록 합니다.
      * @param competitionId: 대회 id
      * @param problemId: 문제 id
-     * @param submitCreateRequestDto: 제출한 team의 code, language를 포함한다.
+     * @param submitAndTestcaseCreateRequestDto: 제출한 team의 code, language를 포함한다.
      */
     @Transactional
-    public SubmitResponseDto createSubmit(Long competitionId, Long problemId, SubmitCreateRequestDto submitCreateRequestDto) {
+    public SubmitResponseDto createSubmit(Long competitionId, Long problemId, SubmitAndTestcaseCreateRequestDto submitAndTestcaseCreateRequestDto) {
         // memberId SecurityContextHolder에서 가져옵니다
         Long memberId = getLoginMemberId();
 
@@ -66,30 +66,30 @@ public class SubmitService {
 
         boolean isCorrect = true;
         // 결과 담을 리스트
-        List<TestCaseInfo> testcaseResults = new ArrayList<>();
+        List<SumbitTestCaseInfo> testcaseResults = new ArrayList<>();
 
         for (Testcase testcase : limitedTestCases) {
-            String executionResult = executeDocker.executeCode(submitCreateRequestDto.getCode(), testcase.getInput(), submitCreateRequestDto.getLanguage());
+            String executionResult = executeDocker.executeCode(submitAndTestcaseCreateRequestDto.getCode(), testcase.getInput(), submitAndTestcaseCreateRequestDto.getLanguage());
             log.info("createSubmit 실행 결과 출력 {}", executionResult);
 
 
             // 타임아웃 처리
             if (executionResult.equals("Timeout")) {
-                testcaseResults.add(TestCaseInfo.of(testcase.getId(), "timeout"));
+                testcaseResults.add(SumbitTestCaseInfo.of(testcase.getId(), "timeout"));
                 isCorrect = false;
 
             } else if (executionResult.startsWith("Error detected:")) {
                 // 파이썬 컴파일 에러
-                testcaseResults.add(TestCaseInfo.of(testcase.getId(), "error"));
+                testcaseResults.add(SumbitTestCaseInfo.of(testcase.getId(), "error"));
                 isCorrect = false;
             } else if (executionResult.startsWith("Error:")) {
                 // 도커 컨테이너 에러
-                testcaseResults.add(TestCaseInfo.of(testcase.getId(), "error"));
+                testcaseResults.add(SumbitTestCaseInfo.of(testcase.getId(), "error"));
                 isCorrect = false;
             } else {
                 // pass, failed 처리
                 String testcaseStatus = executionResult.equals(testcase.getAnswer()) ? "pass" : "failed";
-                testcaseResults.add(TestCaseInfo.of(testcase.getId(), testcaseStatus));
+                testcaseResults.add(SumbitTestCaseInfo.of(testcase.getId(), testcaseStatus));
                 if (!testcaseStatus.equals("pass")) {
                     isCorrect = false;
                 }
@@ -100,8 +100,8 @@ public class SubmitService {
         Submit submit = Submit.builder()
                 .team(team)
                 .problem(problem)
-                .code(submitCreateRequestDto.getCode())
-                .language(submitCreateRequestDto.getLanguage())
+                .code(submitAndTestcaseCreateRequestDto.getCode())
+                .language(submitAndTestcaseCreateRequestDto.getLanguage())
                 .correct(isCorrect)          // 실행결과와 비교해서 ture, false를 입력함.
                 .build();
 

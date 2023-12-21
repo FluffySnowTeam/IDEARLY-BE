@@ -1,5 +1,6 @@
 package fluffysnow.idearly.config;
 
+import fluffysnow.idearly.common.Role;
 import fluffysnow.idearly.common.handler.CustomAccessdeniedHandler;
 import fluffysnow.idearly.common.handler.CustomAuthenticationEntryPoint;
 import fluffysnow.idearly.config.jwt.JwtFilter;
@@ -51,7 +52,9 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().permitAll()
+                                .requestMatchers("/api/login", "api/signup").permitAll()
+                                .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                                .anyRequest().authenticated()
                 );
         http
                 .formLogin(AbstractHttpConfigurer::disable)

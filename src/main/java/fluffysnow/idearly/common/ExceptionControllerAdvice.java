@@ -13,12 +13,20 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class ExceptionControllerAdvice {
 
-    @ExceptionHandler({BadRequestException.class, MethodArgumentNotValidException.class})
+    @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse badRequest(Exception e) {
 
         return ApiResponse.fail(e.getMessage());
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse invalidArgument(Exception e) {
+
+        return ApiResponse.fail("검증되지 않은 입력 값이 요청되었습니다.");
+    }
+
 
     @ExceptionHandler(ForbiddenException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
@@ -53,6 +61,7 @@ public class ExceptionControllerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse serverError(Exception e) {
 
-        return ApiResponse.fail(e.getMessage());
+        log.error("unexpected error occurred: ", e);
+        return ApiResponse.fail("서버에서 알 수 없는 에러가 발생했습니다.");
     }
 }

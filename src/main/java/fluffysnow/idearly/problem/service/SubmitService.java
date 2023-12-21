@@ -1,7 +1,7 @@
 package fluffysnow.idearly.problem.service;
 
 import fluffysnow.idearly.config.CustomUserDetails;
-import fluffysnow.idearly.problem.compile.ExcuteDocker;
+import fluffysnow.idearly.problem.compile.ExecuteDocker;
 import fluffysnow.idearly.problem.domain.Problem;
 import fluffysnow.idearly.problem.domain.Submit;
 import fluffysnow.idearly.problem.domain.Testcase;
@@ -36,7 +36,7 @@ public class SubmitService {
 
     private final TestcaseRepository testcaseRepository;
 
-    private final ExcuteDocker excuteDocker;
+    private final ExecuteDocker executeDocker;
 
     /**
      * 코드 제출 생성 메서드
@@ -69,7 +69,7 @@ public class SubmitService {
         List<TestCaseInfo> testcaseResults = new ArrayList<>();
 
         for (Testcase testcase : limitedTestCases) {
-            String executionResult = excuteDocker.executeCode(submitCreateRequestDto.getCode(), testcase.getInput(), submitCreateRequestDto.getLanguage());
+            String executionResult = executeDocker.executeCode(submitCreateRequestDto.getCode(), testcase.getInput(), submitCreateRequestDto.getLanguage());
             log.info("createSubmit 실행 결과 출력 {}", executionResult);
 
 

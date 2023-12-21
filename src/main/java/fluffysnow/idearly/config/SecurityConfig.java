@@ -1,5 +1,6 @@
 package fluffysnow.idearly.config;
 
+import fluffysnow.idearly.common.Role;
 import fluffysnow.idearly.common.handler.CustomAccessdeniedHandler;
 import fluffysnow.idearly.common.handler.CustomAuthenticationEntryPoint;
 import fluffysnow.idearly.config.jwt.JwtFilter;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -51,7 +53,10 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().permitAll()
+                                .requestMatchers("/api/login", "/api/signup", "/api/competitions").permitAll()
+                                .requestMatchers(HttpMethod.GET, "api/competitions/{competitionId}").permitAll()
+                                .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                                .anyRequest().authenticated()
                 );
         http
                 .formLogin(AbstractHttpConfigurer::disable)

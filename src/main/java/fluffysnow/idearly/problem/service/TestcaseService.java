@@ -3,13 +3,11 @@ package fluffysnow.idearly.problem.service;
 import fluffysnow.idearly.config.CustomUserDetails;
 import fluffysnow.idearly.problem.compile.ExecuteDocker;
 import fluffysnow.idearly.problem.domain.Problem;
-import fluffysnow.idearly.problem.domain.Submit;
 import fluffysnow.idearly.problem.domain.Testcase;
+import fluffysnow.idearly.problem.dto.Testcase.TestcaseInfo;
+import fluffysnow.idearly.problem.dto.Testcase.TestcaseResponseDto;
 import fluffysnow.idearly.problem.dto.submit.SubmitAndTestcaseCreateRequestDto;
-import fluffysnow.idearly.problem.dto.submit.SubmitResponseDto;
-import fluffysnow.idearly.problem.dto.submit.SubmitTestCaseInfo;
 import fluffysnow.idearly.problem.repository.ProblemRepository;
-import fluffysnow.idearly.problem.repository.SubmitRepository;
 import fluffysnow.idearly.problem.repository.TestcaseRepository;
 import fluffysnow.idearly.team.domain.MemberTeam;
 import fluffysnow.idearly.team.domain.Team;
@@ -27,9 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class SubmitService {
-    private final SubmitRepository submitRepository;
-
+public class TestcaseService {
     private final MemberTeamRepository memberTeamRepository;
 
     private final ProblemRepository problemRepository;
@@ -39,15 +35,14 @@ public class SubmitService {
     private final ExecuteDocker executeDocker;
 
     /**
-     * 코드 제출 생성 메서드
-     * 제출한 team의 문제 id에 대한 제출 정보를 docker 컨테이너 내부에서 처리 후 반환값을 검증하고, 정답여부, 제출 정보를 저장한다.
-     * 여러 테스트 케이스 중 첫 세 개의 테스트 케이스만 실행하도록 합니다.
+     * 테스트 케이스 실행 메스드
+     * 테스트 케이스 hidden이 false인 테스트 케이스만 실행하도록 합니다.
      * @param competitionId: 대회 id
      * @param problemId: 문제 id
      * @param submitAndTestcaseCreateRequestDto: 제출한 team의 code, language를 포함한다.
      */
     @Transactional
-    public SubmitResponseDto createSubmit(Long competitionId, Long problemId, SubmitAndTestcaseCreateRequestDto submitAndTestcaseCreateRequestDto) {
+    public TestcaseResponseDto ExecuteTestcase(Long competitionId, Long problemId, SubmitAndTestcaseCreateRequestDto submitAndTestcaseCreateRequestDto) {
         // memberId SecurityContextHolder에서 가져옵니다
         Long memberId = getLoginMemberId();
 
@@ -60,54 +55,42 @@ public class SubmitService {
 
         Problem problem = problemRepository.findById(problemId).orElseThrow();
 
-        // problemId에 해당한 전체 testCase를 불러옵니다.
-        List<Testcase> limitedTestCases = testcaseRepository.findTestCaseByProblemId(problemId);
+        // problemId에 hidden이 false인 테스트 케이스만 가져옵니다.
+        List<Testcase> limitedTestCases = testcaseRepository.findNonHiddenTestcaseByProblemId(problemId);
 
         boolean isCorrect = true;
         // 결과 담을 리스트
-        List<SubmitTestCaseInfo> testcaseResults = new ArrayList<>();
+        List<TestcaseInfo> testcaseResults = new ArrayList<>();
 
         for (Testcase testcase : limitedTestCases) {
             String executionResult = executeDocker.executeCode(submitAndTestcaseCreateRequestDto.getCode(), testcase.getInput(), submitAndTestcaseCreateRequestDto.getLanguage());
-            log.info("createSubmit 실행 결과 출력 {}", executionResult);
+            log.info("executeTestcase 실행 결과 출력 {}", executionResult);
 
 
             // 타임아웃 처리
             if (executionResult.equals("Timeout")) {
-                testcaseResults.add(SubmitTestCaseInfo.of(testcase.getId(), "timeout"));
+                testcaseResults.add(TestcaseInfo.of(testcase.getId(), testcase.getInput(), testcase.getAnswer(), executionResult, "timeout"));
                 isCorrect = false;
 
             } else if (executionResult.startsWith("Error detected:")) {
                 // 파이썬 컴파일 에러
-                testcaseResults.add(SubmitTestCaseInfo.of(testcase.getId(), "error"));
+                testcaseResults.add(TestcaseInfo.of(testcase.getId(), testcase.getInput(), testcase.getAnswer(), executionResult, "error"));
                 isCorrect = false;
             } else if (executionResult.startsWith("Error:")) {
                 // 도커 컨테이너 에러
-                testcaseResults.add(SubmitTestCaseInfo.of(testcase.getId(), "error"));
+                testcaseResults.add(TestcaseInfo.of(testcase.getId(), testcase.getInput(), testcase.getAnswer(), executionResult, "error"));
                 isCorrect = false;
             } else {
                 // pass, failed 처리
                 String testcaseStatus = executionResult.equals(testcase.getAnswer()) ? "pass" : "failed";
-                testcaseResults.add(SubmitTestCaseInfo.of(testcase.getId(), testcaseStatus));
+                testcaseResults.add(TestcaseInfo.of(testcase.getId(), testcase.getInput(), testcase.getAnswer(), executionResult, testcaseStatus));
                 if (!testcaseStatus.equals("pass")) {
                     isCorrect = false;
                 }
             }
         }
 
-        // 제출정보를 생성
-        Submit submit = Submit.builder()
-                .team(team)
-                .problem(problem)
-                .code(submitAndTestcaseCreateRequestDto.getCode())
-                .language(submitAndTestcaseCreateRequestDto.getLanguage())
-                .correct(isCorrect)          // 실행결과와 비교해서 ture, false를 입력함.
-                .build();
-
-        submitRepository.save(submit);
-
-        // 반환은 correct, testcaseId, status 필요.
-        return SubmitResponseDto.of(isCorrect, testcaseResults);
+        return TestcaseResponseDto.of(isCorrect, testcaseResults);
     }
 
     /**

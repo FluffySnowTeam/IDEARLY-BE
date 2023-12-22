@@ -1,4 +1,4 @@
-package fluffysnow.idearly.problem.dto.submit;
+package fluffysnow.idearly.problem.dto.Testcase;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,13 +10,12 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class SubmitResponseDto {
+public class TestcaseResponseDto {
     private boolean correct;
-    private List<SubmitTestCaseInfo> testcases;
+    private List<TestcaseInfo> testcases;
 
     // 정적 팩토리 메서드로 해당 Dto를 생성합니다.
-    public static SubmitResponseDto of(boolean correct, List<SubmitTestCaseInfo> testcases) {
-        return new SubmitResponseDto(correct, testcases);
+    public static TestcaseResponseDto of(boolean correct, List<TestcaseInfo> testcases) {
+        return new TestcaseResponseDto(correct, testcases);
     }
 }
-

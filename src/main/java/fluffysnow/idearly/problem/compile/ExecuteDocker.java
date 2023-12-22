@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
-public class ExcuteDocker {
+public class ExecuteDocker {
     /**
      * 제출된 코드에 대한 실행을 처리하는 메서드
      * @param code: 제출 코드
@@ -18,12 +18,12 @@ public class ExcuteDocker {
      */
     public String executeCode(String code, String input, Language language) {
         DockerConfig dockerConfig = new DockerConfig();
-        String iamgeName = getImageNameForLanguage(language);
+        String imageName = getImageNameForLanguage(language);
         String excutableCode = combineCodeAndInput(code, input, language);
 
         // 도커 컨테이너 생성 및 실행
         // 도커 컨테이너 실행 및 타임 아웃 처리 로직
-        String containerId = dockerConfig.createContainer(excutableCode, iamgeName, language);
+        String containerId = dockerConfig.createContainer(excutableCode, imageName, language);
         return executeContainerAndHandleExceptions(dockerConfig, containerId);
     }
 

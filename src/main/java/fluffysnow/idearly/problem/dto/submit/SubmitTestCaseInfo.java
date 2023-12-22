@@ -5,18 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class SubmitResponseDto {
-    private boolean correct;
-    private List<SubmitTestCaseInfo> testcases;
+public class SubmitTestCaseInfo {
+    private Long testCaseId;
+    private String status;  // pass, failed, error, timeout
 
     // 정적 팩토리 메서드로 해당 Dto를 생성합니다.
-    public static SubmitResponseDto of(boolean correct, List<SubmitTestCaseInfo> testcases) {
-        return new SubmitResponseDto(correct, testcases);
+    public static SubmitTestCaseInfo of(Long testCaseId, String status) {
+        return new SubmitTestCaseInfo(testCaseId, status);
     }
 }
-

@@ -36,8 +36,6 @@ class AdminServiceTest {
     @Autowired
     private CompetitionService competitionService;
     @Autowired
-    private CompetitionRepository competitionRepository;
-    @Autowired
     private AdminService adminService;
     @Autowired
     private ProblemRepository problemRepository;
@@ -52,8 +50,7 @@ class AdminServiceTest {
         memberRepository.save(member);
         Member adminMember = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("회원을 찾을 수 없습니다."));
         CompetitionCreateRequestDto competitionCreateRequestDto = new CompetitionCreateRequestDto("대회", "대회 설명", LocalDateTime.now(), LocalDateTime.now());
-        competitionService.createCompetition(competitionCreateRequestDto, adminMember.getId());
-        Competition competition = competitionRepository.findByName("대회").orElseThrow(() -> new NotFoundException("대회를 찾을 수 없습니다."));
+        Competition competition = competitionService.createCompetition(competitionCreateRequestDto, adminMember.getId());
 
         ProblemCreateRequestDto requestDto = new ProblemCreateRequestDto("문제", "문제 설명");
         ProblemCreateResponseDto responseDto = adminService.createProblem(requestDto, competition.getId());
@@ -71,8 +68,8 @@ class AdminServiceTest {
         memberRepository.save(member);
         Member adminMember = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("회원을 찾을 수 없습니다."));
         CompetitionCreateRequestDto competitionCreateRequestDto = new CompetitionCreateRequestDto("대회", "대회 설명", LocalDateTime.now(), LocalDateTime.now());
-        competitionService.createCompetition(competitionCreateRequestDto, adminMember.getId());
-        Competition competition = competitionRepository.findByName("대회").orElseThrow(() -> new NotFoundException("대회를 찾을 수 없습니다."));
+        Competition competition = competitionService.createCompetition(competitionCreateRequestDto, adminMember.getId());
+
         ProblemCreateRequestDto problemCreateRequestDto = new ProblemCreateRequestDto("문제", "문제 설명");
         ProblemCreateResponseDto problemCreateResponseDto = adminService.createProblem(problemCreateRequestDto, competition.getId());
         Problem problem = problemRepository.findById(problemCreateResponseDto.getProblemId()).orElseThrow(() -> new NotFoundException("문제를 찾을 수 없습니다."));

@@ -99,7 +99,9 @@ public class CompetitionService {
         return InvitableResponseDto.of(findMember, invitable);
     }
 
-    public Competition createCompetition(CompetitionCreateRequestDto requestDto, Member adminMember) {
+    public Competition createCompetition(CompetitionCreateRequestDto requestDto, Long adminMemberId) {
+
+        Member adminMember = memberRepository.findById(adminMemberId).orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
 
         Competition competition = new Competition(requestDto.getTitle(), requestDto.getDescription(), requestDto.getStartDateTime(), requestDto.getEndDateTime(), adminMember);
 

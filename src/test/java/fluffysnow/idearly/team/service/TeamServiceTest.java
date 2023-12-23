@@ -1,6 +1,8 @@
 package fluffysnow.idearly.team.service;
 
 import fluffysnow.idearly.common.InviteStatus;
+import fluffysnow.idearly.common.Role;
+import fluffysnow.idearly.common.exception.NotFoundException;
 import fluffysnow.idearly.competition.domain.Competition;
 import fluffysnow.idearly.competition.dto.CompetitionCreateRequestDto;
 import fluffysnow.idearly.competition.dto.CompetitionParticipateRequestDto;
@@ -19,6 +21,8 @@ import fluffysnow.idearly.team.repository.MemberTeamRepository;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,8 +55,21 @@ class TeamServiceTest {
     @Autowired
     private MemberTeamRepository memberTeamRepository;
 
+    @BeforeEach
+    void beforeEach() {
+        Member member = new Member("aaa@naver.com", "관리자", "12345678", Role.ADMIN);
+        memberRepository.save(member);
+    }
+
+    @AfterEach
+    void afterEach() {
+        Member member = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다!"));
+        memberRepository.delete(member);
+    }
+
     @Test
     void getBelongTeamList() {
+        Member adminMember = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
 
         MemberCreateRequestDto memberCreateDto1 = new MemberCreateRequestDto("a@a.com", "회원1", "123");
         MemberCreateRequestDto memberCreateDto2 = new MemberCreateRequestDto("b@b.com", "회원2", "123");
@@ -63,7 +80,7 @@ class TeamServiceTest {
         Member loginMember = memberRepository.findByEmail("a@a.com").get();
 
         CompetitionCreateRequestDto createRequestDto = new CompetitionCreateRequestDto("대회 이름", "대회 설명", LocalDateTime.now().minusDays(1L), LocalDateTime.now().plusDays(1L));
-        Competition competition = competitionService.createCompetition(createRequestDto, null);
+        Competition competition = competitionService.createCompetition(createRequestDto, adminMember.getId());
 
         TeammateRequestDto teammateRequest1 = new TeammateRequestDto("b@b.com", "회원2");
         TeammateRequestDto teammateRequest2 = new TeammateRequestDto("c@c.com", "회원3");
@@ -86,6 +103,7 @@ class TeamServiceTest {
 
     @Test
     void getInviteTeamList() {
+        Member adminMember = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
         //member와
         MemberCreateRequestDto memberCreateDto1 = new MemberCreateRequestDto("a@a.com", "회원1", "123");
         MemberCreateRequestDto memberCreateDto2 = new MemberCreateRequestDto("b@b.com", "회원2", "123");
@@ -100,7 +118,7 @@ class TeamServiceTest {
         Member loginMember2 = memberRepository.findByEmail("b@b.com").get();
 
         CompetitionCreateRequestDto createRequestDto = new CompetitionCreateRequestDto("대회 이름", "대회 설명", LocalDateTime.now().minusDays(1L), LocalDateTime.now().plusDays(1L));
-        Competition competition = competitionService.createCompetition(createRequestDto, null);
+        Competition competition = competitionService.createCompetition(createRequestDto, adminMember.getId());
 
         TeammateRequestDto teammateRequest1 = new TeammateRequestDto("b@b.com", "회원2");
         TeammateRequestDto teammateRequest2 = new TeammateRequestDto("c@c.com", "회원3");
@@ -122,6 +140,8 @@ class TeamServiceTest {
 
     @Test
     void getTeamDetail() {
+        Member adminMember = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
+
         MemberCreateRequestDto memberCreateDto1 = new MemberCreateRequestDto("a@a.com", "회원1", "123");
         MemberCreateRequestDto memberCreateDto2 = new MemberCreateRequestDto("b@b.com", "회원2", "123");
         MemberCreateRequestDto memberCreateDto3 = new MemberCreateRequestDto("c@c.com", "회원3", "123");
@@ -131,7 +151,7 @@ class TeamServiceTest {
         Member loginMember = memberRepository.findByEmail("a@a.com").get();
 
         CompetitionCreateRequestDto createRequestDto = new CompetitionCreateRequestDto("대회 이름", "대회 설명", LocalDateTime.now().minusDays(1L), LocalDateTime.now().plusDays(1L));
-        Competition competition = competitionService.createCompetition(createRequestDto, null);
+        Competition competition = competitionService.createCompetition(createRequestDto, adminMember.getId());
 
         TeammateRequestDto teammateRequest1 = new TeammateRequestDto("b@b.com", "회원2");
         TeammateRequestDto teammateRequest2 = new TeammateRequestDto("c@c.com", "회원3");
@@ -165,6 +185,7 @@ class TeamServiceTest {
 
     @Test
     void acceptInvite() {
+        Member adminMember = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
 
         MemberCreateRequestDto memberCreateDto1 = new MemberCreateRequestDto("a@a.com", "회원1", "123");
         MemberCreateRequestDto memberCreateDto2 = new MemberCreateRequestDto("b@b.com", "회원2", "123");
@@ -175,7 +196,7 @@ class TeamServiceTest {
         Member loginMember = memberRepository.findByEmail("a@a.com").get();
 
         CompetitionCreateRequestDto createRequestDto = new CompetitionCreateRequestDto("대회 이름", "대회 설명", LocalDateTime.now().minusDays(1L), LocalDateTime.now().plusDays(1L));
-        Competition competition = competitionService.createCompetition(createRequestDto, null);
+        Competition competition = competitionService.createCompetition(createRequestDto, adminMember.getId());
 
         TeammateRequestDto teammateRequest1 = new TeammateRequestDto("b@b.com", "회원2");
         TeammateRequestDto teammateRequest2 = new TeammateRequestDto("c@c.com", "회원3");
@@ -234,6 +255,7 @@ class TeamServiceTest {
 
     @Test
     void denyInvite() {
+        Member adminMember = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
 
         MemberCreateRequestDto memberCreateDto1 = new MemberCreateRequestDto("a@a.com", "회원1", "123");
         MemberCreateRequestDto memberCreateDto2 = new MemberCreateRequestDto("b@b.com", "회원2", "123");
@@ -244,7 +266,7 @@ class TeamServiceTest {
         Member loginMember = memberRepository.findByEmail("a@a.com").get();
 
         CompetitionCreateRequestDto createRequestDto = new CompetitionCreateRequestDto("대회 이름", "대회 설명", LocalDateTime.now().minusDays(1L), LocalDateTime.now().plusDays(1L));
-        Competition competition = competitionService.createCompetition(createRequestDto, null);
+        Competition competition = competitionService.createCompetition(createRequestDto, adminMember.getId());
 
         TeammateRequestDto teammateRequest1 = new TeammateRequestDto("b@b.com", "회원2");
         TeammateRequestDto teammateRequest2 = new TeammateRequestDto("c@c.com", "회원3");
@@ -301,6 +323,8 @@ class TeamServiceTest {
 
     @Test
     void editTeam() {
+        Member adminMember = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
+
         MemberCreateRequestDto memberCreateDto1 = new MemberCreateRequestDto("a@a.com", "회원1", "123");
         MemberCreateRequestDto memberCreateDto2 = new MemberCreateRequestDto("b@b.com", "회원2", "123");
         MemberCreateRequestDto memberCreateDto3 = new MemberCreateRequestDto("c@c.com", "회원3", "123");
@@ -310,7 +334,7 @@ class TeamServiceTest {
         Member loginMember = memberRepository.findByEmail("a@a.com").get();
 
         CompetitionCreateRequestDto createRequestDto = new CompetitionCreateRequestDto("대회 이름", "대회 설명", LocalDateTime.now().minusDays(1L), LocalDateTime.now().plusDays(1L));
-        Competition competition = competitionService.createCompetition(createRequestDto, null);
+        Competition competition = competitionService.createCompetition(createRequestDto, adminMember.getId());
 
         TeammateRequestDto teammateRequest1 = new TeammateRequestDto("b@b.com", "회원2");
         TeammateRequestDto teammateRequest2 = new TeammateRequestDto("c@c.com", "회원3");
@@ -353,6 +377,8 @@ class TeamServiceTest {
     @Test
     @DisplayName("이미 수락한 사람의 상태는 유지되어야한다.")
     void editTeam2() {
+        Member adminMember = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
+
         MemberCreateRequestDto memberCreateDto1 = new MemberCreateRequestDto("a@a.com", "회원1", "123");
         MemberCreateRequestDto memberCreateDto2 = new MemberCreateRequestDto("b@b.com", "회원2", "123");
         MemberCreateRequestDto memberCreateDto3 = new MemberCreateRequestDto("c@c.com", "회원3", "123");
@@ -362,7 +388,7 @@ class TeamServiceTest {
         Member loginMember = memberRepository.findByEmail("a@a.com").get();
 
         CompetitionCreateRequestDto createRequestDto = new CompetitionCreateRequestDto("대회 이름", "대회 설명", LocalDateTime.now().minusDays(1L), LocalDateTime.now().plusDays(1L));
-        Competition competition = competitionService.createCompetition(createRequestDto, null);
+        Competition competition = competitionService.createCompetition(createRequestDto, adminMember.getId());
 
         TeammateRequestDto teammateRequest1 = new TeammateRequestDto("b@b.com", "회원2");
         TeammateRequestDto teammateRequest2 = new TeammateRequestDto("c@c.com", "회원3");

@@ -130,4 +130,12 @@ public class MemberService {
 
         return EditMemberResponseDto.of(member);
     }
+
+    @Transactional
+    public void withdrawMember(TokenRequestDto requestDto, Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException("회원정보를 찾을 수 없습니다."));
+
+        memberRepository.delete(member);
+        logout(requestDto);
+    }
 }

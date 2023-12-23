@@ -124,6 +124,35 @@ public class MemberController {
         return ApiResponse.ok(responseDto);
     }
 
+    @DeleteMapping("/members")
+    public ApiResponse<Void> deleteMember(@CookieValue("accessToken") String accessToken, @CookieValue("refreshToken") String refreshToken, HttpServletRequest request, HttpServletResponse response) {
+        TokenRequestDto tokenRequestDto = new TokenRequestDto(accessToken, refreshToken);
+        Long loginMemberId = getLoginMemberId();
+        memberService.withdrawMember(tokenRequestDto, loginMemberId);
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("accessToken".equals(cookie.getName())) {
+                    // 기존 쿠키 수정
+                    cookie.setValue("None");
+                    cookie.setMaxAge(1); // 쿠키의 유효 시간 설정 (초 단위)
+                    response.addCookie(cookie);
+                }
+            }
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    // 기존 쿠키 수정
+                    cookie.setValue("None");
+                    cookie.setPath("/");
+                    cookie.setMaxAge(1); // 쿠키의 유효 시간 설정 (초 단위)
+                    response.addCookie(cookie);
+                }
+            }
+        }
+        return ApiResponse.ok(null);
+    }
+
     private static Long getLoginMemberId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long loginMemberId = null;

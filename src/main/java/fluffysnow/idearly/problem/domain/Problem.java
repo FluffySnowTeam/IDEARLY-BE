@@ -32,6 +32,10 @@ public class Problem {
     @OneToMany(mappedBy = "problem")
     private List<Testcase> testcases;
 
+    @OneToMany(mappedBy = "problem")
+    private List<Template> templates;
+
+
     public void updateProblem(String name, String description){
         this.name = name;
         this.description = description;

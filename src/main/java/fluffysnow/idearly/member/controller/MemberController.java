@@ -88,9 +88,29 @@ public class MemberController {
     }
 
     @PostMapping("/logout")
-    public ApiResponse<Void> logout(@CookieValue("accessToken") String accessToken, @CookieValue("refreshToken") String refreshToken) {
+    public ApiResponse<Void> logout(@CookieValue("accessToken") String accessToken, @CookieValue("refreshToken") String refreshToken, HttpServletRequest request, HttpServletResponse response) {
         TokenRequestDto tokenRequestDto = new TokenRequestDto(accessToken, refreshToken);
         memberService.logout(tokenRequestDto);
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("accessToken".equals(cookie.getName())) {
+                    // 기존 쿠키 수정
+                    cookie.setValue("None");
+                    cookie.setMaxAge(1); // 쿠키의 유효 시간 설정 (초 단위)
+                    response.addCookie(cookie);
+                }
+            }
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    // 기존 쿠키 수정
+                    cookie.setValue("None");
+                    cookie.setPath("/");
+                    cookie.setMaxAge(1); // 쿠키의 유효 시간 설정 (초 단위)
+                    response.addCookie(cookie);
+                }
+            }
+        }
         return ApiResponse.ok(null);
     }
 
@@ -115,5 +135,4 @@ public class MemberController {
         }
         return loginMemberId;
     }
-
 }

@@ -2,6 +2,7 @@ package fluffysnow.idearly.member.service;
 
 import fluffysnow.idearly.common.Role;
 import fluffysnow.idearly.common.exception.BadRequestException;
+import fluffysnow.idearly.common.exception.NotFoundException;
 import fluffysnow.idearly.common.exception.UnauthorizedException;
 import fluffysnow.idearly.config.CustomUserDetails;
 import fluffysnow.idearly.config.jwt.JwtProvider;
@@ -119,5 +120,14 @@ public class MemberService {
     public MemberDuplicateCheckResponseDto duplicateCheck(String email) {
         boolean duplicate = memberRepository.findByEmail(email).isPresent();
         return MemberDuplicateCheckResponseDto.from(duplicate);
+    }
+
+    @Transactional
+    public EditMemberResponseDto editMember(EditMemberRequestDto editMemberRequestDto, Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException("회원정보를 찾을 수 없습니다."));
+
+        member.update(editMemberRequestDto.getName());
+
+        return EditMemberResponseDto.of(member);
     }
 }

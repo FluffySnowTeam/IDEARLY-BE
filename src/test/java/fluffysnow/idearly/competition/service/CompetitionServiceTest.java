@@ -99,7 +99,7 @@ class CompetitionServiceTest {
         CompetitionDetailResponseDto competitionDetailResponse = competitionService.getCompetitionDetail(competition.getId(), null);
 
         assertThat(competitionDetailResponse.getCompetitionId()).isEqualTo(competition.getId());
-        assertThat(competitionDetailResponse.getCompetitionTitle()).isEqualTo(competition.getName());
+        assertThat(competitionDetailResponse.getTitle()).isEqualTo(competition.getName());
         assertThat(competitionDetailResponse.getDescription()).isEqualTo(competition.getDescription());
         assertThat(competitionDetailResponse.isLogin()).isFalse();
         assertThat(competitionDetailResponse.getTeamId()).isNull();
@@ -133,7 +133,7 @@ class CompetitionServiceTest {
         CompetitionParticipateResponseDto participateResponse = competitionService.participateInCompetition(competition.getId(), competitionParticipateRequest, loginMember.getId());
 
         assertThat(participateResponse.getCompetitionId()).isEqualTo(competition.getId());
-        assertThat(participateResponse.getCompetitionTitle()).isEqualTo(competition.getName());
+        assertThat(participateResponse.getTitle()).isEqualTo(competition.getName());
         assertThat(participateResponse.getTeamId()).isNotNull();
         assertThat(participateResponse.getTeammates().size()).isEqualTo(3);
         log.info("teammate1: {} {}", participateResponse.getTeammates().get(0).getEmail(), participateResponse.getTeammates().get(0).getInviteStatus());

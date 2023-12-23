@@ -1,9 +1,12 @@
 package fluffysnow.idearly.problem.controller;
 
 import fluffysnow.idearly.common.ApiResponse;
+import fluffysnow.idearly.common.Language;
+import fluffysnow.idearly.problem.dto.ProblemResponseDto;
 import fluffysnow.idearly.problem.dto.Testcase.TestcaseResponseDto;
 import fluffysnow.idearly.problem.dto.submit.SubmitResponseDto;
 import fluffysnow.idearly.problem.dto.submit.SubmitAndTestcaseCreateRequestDto;
+import fluffysnow.idearly.problem.service.ProblemService;
 import fluffysnow.idearly.problem.service.SubmitService;
 import fluffysnow.idearly.problem.service.TestcaseService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +18,20 @@ import org.springframework.web.bind.annotation.*;
 public class ProblemController {
     private final SubmitService submitService;
     private final TestcaseService testcaseService;
+    private final ProblemService problemService;
+
+    /**
+     * 알고리즘 문제 조회
+     * @param competitionId : 대회 아이디를 전달 받습니다.
+     * @param problemId : 문제 아이디를 전달 받습니다.
+     * @param language : 언어를 전달 받습니다.
+     * @return : 문제 정보를 반환합니다.
+     */
+    @GetMapping("/{competitionId}/problems/{problemId}")
+    public ApiResponse<ProblemResponseDto> getProblem(@PathVariable("competitionId") Long competitionId, @PathVariable("problemId") Long problemId, Language language) {
+        ProblemResponseDto problem = problemService.getProblem(competitionId, problemId, language);
+        return ApiResponse.ok(problem);
+    }
 
     /**
      * 알고리즘 문제 제출

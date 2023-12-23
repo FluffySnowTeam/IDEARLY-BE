@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class SubmitCreateRequestDto {
+public class SubmitAndTestcaseCreateRequestDto {
     private String code;
     private Language language;
 
-    public static SubmitCreateRequestDto of(String code, Language language) {
-        return new SubmitCreateRequestDto(code, language);
+    public static SubmitAndTestcaseCreateRequestDto of(String code, Language language) {
+        return new SubmitAndTestcaseCreateRequestDto(code, language);
     }
 }

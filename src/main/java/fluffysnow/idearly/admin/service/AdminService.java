@@ -25,6 +25,7 @@ public class AdminService {
     private final CompetitionRepository competitionRepository;
     private final TestcaseRepository testcaseRepository;
 
+    @Transactional
     public ProblemCreateResponseDto createProblem(ProblemCreateRequestDto requestDto, Long competitionId) {
 
         Competition competition = competitionRepository.findById(competitionId).orElseThrow(() -> new NotFoundException("대회를 찾을 수 없습니다."));
@@ -35,6 +36,7 @@ public class AdminService {
         return ProblemCreateResponseDto.of(problem, competitionId);
     }
 
+    @Transactional
     public TestcaseCreateResponseDto createTestcase(TestcaseCreateRequestDto requestDto, Long problemId) {
 
         Problem problem = problemRepository.findById(problemId).orElseThrow(() -> new NotFoundException("문제를 찾을 수 없습니다."));

@@ -35,6 +35,11 @@ public class Problem {
     @OneToMany(mappedBy = "problem")
     private List<Template> templates;
 
+    public Problem(String name, String description, Competition competition) {
+        this.name = name;
+        this.description = description;
+        this.competition = competition;
+    }
 
     public void updateProblem(String name, String description){
         this.name = name;

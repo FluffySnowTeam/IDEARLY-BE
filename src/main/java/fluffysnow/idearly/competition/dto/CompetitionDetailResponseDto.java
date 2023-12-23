@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class CompetitionDetailResponseDto {
 
     private Long competitionId;
-    private String competitionTitle;
+    private String title;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
     private String description;

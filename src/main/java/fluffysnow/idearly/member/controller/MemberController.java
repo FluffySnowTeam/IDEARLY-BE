@@ -1,6 +1,7 @@
 package fluffysnow.idearly.member.controller;
 
 import fluffysnow.idearly.common.ApiResponse;
+import fluffysnow.idearly.config.CustomUserDetails;
 import fluffysnow.idearly.member.domain.Member;
 import fluffysnow.idearly.member.dto.*;
 import fluffysnow.idearly.member.service.MemberService;
@@ -9,6 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -89,6 +92,28 @@ public class MemberController {
         TokenRequestDto tokenRequestDto = new TokenRequestDto(accessToken, refreshToken);
         memberService.logout(tokenRequestDto);
         return ApiResponse.ok(null);
+    }
+
+    @PatchMapping("/members")
+    public ApiResponse<EditMemberResponseDto> updateMember(@RequestBody EditMemberRequestDto requestDto) {
+
+        Long loginMemberId = getLoginMemberId();
+
+        EditMemberResponseDto responseDto = memberService.editMember(requestDto, loginMemberId);
+
+        return ApiResponse.ok(responseDto);
+    }
+
+    private static Long getLoginMemberId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long loginMemberId = null;
+
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
+            // 인증 정보 사용
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            loginMemberId = customUserDetails.getMemberId();
+        }
+        return loginMemberId;
     }
 
 }

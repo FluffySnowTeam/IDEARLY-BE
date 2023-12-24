@@ -16,7 +16,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.setContentType("text/html;charset=utf-8");
-        response.getWriter().write("<script>alert('로그인 해주세요.'); location.href='/login';</script>");
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "인증안된 회원입니다.");
+//        response.setContentType("text/html;charset=utf-8");
+//        response.getWriter().write("<script>alert('로그인 해주세요.'); location.href='/login';</script>");
     }
 }

@@ -1,5 +1,6 @@
 package fluffysnow.idearly.member.service;
 
+import fluffysnow.idearly.common.exception.NotFoundException;
 import fluffysnow.idearly.member.domain.Member;
 import fluffysnow.idearly.member.dto.*;
 import fluffysnow.idearly.member.repository.MemberRepository;
@@ -34,7 +35,7 @@ class MemberServiceTest {
     @DisplayName("회원가입")
     void createUserTest() {
         MemberCreateRequestDto memberCreateRequestDto = new MemberCreateRequestDto("aaa@naver.com", "정관휘", "12345678");
-        Member member = memberRepository.findByEmail("aaa@naver.com").orElseThrow(); // 오류 출력
+        Member member = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("회원 정보를 찾을 수 없습니다."));
 
         assertNotNull(member);
         assertEquals(member.getName(), memberCreateRequestDto.getName());
@@ -57,5 +58,19 @@ class MemberServiceTest {
         MemberDuplicateCheckResponseDto memberDuplicateCheckResponseDto = memberService.duplicateCheck(email);
 
         assertTrue(memberDuplicateCheckResponseDto.isDuplicate());
+    }
+
+    @Test
+    @DisplayName("회원정보 수정 체크")
+    void editMemberTest() {
+        MemberCreateRequestDto dto = new MemberCreateRequestDto("bbb@naver.com", "정관휘", "12345678");
+        memberService.createUser(dto);
+        Member member = memberRepository.findByEmail("bbb@naver.com").orElseThrow(() -> new NotFoundException("회원정보가 없습니다."));
+        EditMemberRequestDto editMemberRequestDto = new EditMemberRequestDto("사용자");
+
+        EditMemberResponseDto responseDto = memberService.editMember(editMemberRequestDto, member.getId());
+
+        assertEquals(responseDto.getEmail(), "bbb@naver.com");
+        assertEquals(responseDto.getName(), "사용자");
     }
 }

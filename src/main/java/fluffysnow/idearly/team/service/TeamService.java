@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 
@@ -70,8 +71,7 @@ public class TeamService {
     @Transactional(readOnly = true)
     public List<TeamResponseDto> getBelongTeamList(Long loginMemberId) {
 
-        LocalDateTime now = LocalDateTime.now();
-        log.info("now: {}", now);
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         List<MemberTeam> memberTeamList = memberTeamRepository.findAvailableBelongMemberTeamByMemberId(loginMemberId, now);
         List<Team> teams = memberTeamList.stream().map(MemberTeam::getTeam).toList();
 
@@ -81,7 +81,7 @@ public class TeamService {
     @Transactional(readOnly = true)
     public List<TeamResponseDto> getInviteTeamList(Long loginMemberId) {
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         List<MemberTeam> memberTeamList = memberTeamRepository.findAvailableInviteMemberTeamByMemberId(loginMemberId, now);
         List<Team> teams = memberTeamList.stream().map(MemberTeam::getTeam).toList();
 

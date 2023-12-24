@@ -70,20 +70,28 @@ class CompetitionServiceTest {
     void competitionList() {
         Member member = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
 
-        CompetitionCreateRequestDto createRequestDto1 = new CompetitionCreateRequestDto("대회 이름1", "대회 설명1", LocalDateTime.now(), LocalDateTime.now());
+        CompetitionCreateRequestDto createRequestDto1 = new CompetitionCreateRequestDto("대회 이름1", "대회 설명1", LocalDateTime.now(), LocalDateTime.now().plusDays(1L));
         Competition competition1 = competitionService.createCompetition(createRequestDto1, member.getId());
 
-        CompetitionCreateRequestDto createRequestDto2 = new CompetitionCreateRequestDto("대회 이름2", "대회 설명2", LocalDateTime.now(), LocalDateTime.now());
+        CompetitionCreateRequestDto createRequestDto2 = new CompetitionCreateRequestDto("대회 이름2", "대회 설명2", LocalDateTime.now(), LocalDateTime.now().plusDays(1L));
         Competition competition2 = competitionService.createCompetition(createRequestDto2, member.getId());
+
+        CompetitionCreateRequestDto createRequestDto3 = new CompetitionCreateRequestDto("대회 이름3", "대회 설명3", LocalDateTime.now().minusDays(1L), LocalDateTime.now().minusDays(1L));
+        Competition competition3 = competitionService.createCompetition(createRequestDto3, member.getId());
 
         em.flush();
         em.clear();
 
-        List<CompetitionResponseDto> competitionList = competitionService.getCompetitionList();
-        assertThat(competitionList.size()).isEqualTo(2);
+        List<CompetitionResponseDto> availableCompetitionList = competitionService.getCompetitionList(true);
+        assertThat(availableCompetitionList.size()).isEqualTo(2);
 
-        assertThat(competitionList.get(0).getCompetitionId()).isEqualTo(competition1.getId());
-        assertThat(competitionList.get(1).getCompetitionId()).isEqualTo(competition2.getId());
+        assertThat(availableCompetitionList.get(0).getCompetitionId()).isEqualTo(competition1.getId());
+        assertThat(availableCompetitionList.get(1).getCompetitionId()).isEqualTo(competition2.getId());
+
+        List<CompetitionResponseDto> unavailableCompetitionList = competitionService.getCompetitionList(false);
+        assertThat(unavailableCompetitionList.size()).isEqualTo(1);
+
+        assertThat(unavailableCompetitionList.get(0).getCompetitionId()).isEqualTo(competition3.getId());
     }
 
     @Test

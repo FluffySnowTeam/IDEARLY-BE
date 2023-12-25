@@ -1,5 +1,6 @@
 package fluffysnow.idearly.member.service;
 
+import fluffysnow.idearly.common.exception.UnauthorizedException;
 import fluffysnow.idearly.config.CustomUserDetails;
 import fluffysnow.idearly.member.domain.Member;
 import fluffysnow.idearly.member.dto.MemberRequestDto;
@@ -37,7 +38,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         log.info("Principal is instanceof {}", authentication.getPrincipal().getClass());
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        CustomUserDetails userDetails = null;
+        try {
+            userDetails = (CustomUserDetails) authentication.getPrincipal();
+        } catch (ClassCastException e) {
+            throw new UnauthorizedException("인증되지 않은 사용자의 접근입니다.");
+        }
+
         log.info("CustomUserDetails.getMemberId: {}", userDetails.getMemberId());
 
         return memberRepository.findByEmail(userDetails.getUsername()).orElseThrow();   //userNotFound 예외

@@ -1,6 +1,9 @@
 package fluffysnow.idearly.member.service;
 
 import fluffysnow.idearly.common.Role;
+import fluffysnow.idearly.common.exception.BadRequestException;
+import fluffysnow.idearly.common.exception.NotFoundException;
+import fluffysnow.idearly.common.exception.UnauthorizedException;
 import fluffysnow.idearly.config.CustomUserDetails;
 import fluffysnow.idearly.config.jwt.JwtProvider;
 import fluffysnow.idearly.member.domain.Member;
@@ -12,8 +15,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,7 @@ public class MemberService {
         Optional<Member> memberOptional = memberRepository.findByEmail(dto.getEmail());
         if (memberOptional.isPresent()) {
             log.info("이미 존재하는 이메일입니다."); // 에러 처리
+            throw new BadRequestException("이미 존재하는 회원의 회원가입 요청입니다.");
         }
         Member encoding = new Member(dto.getEmail(), dto.getName(), bCryptPasswordEncoder.encode(dto.getPassword()), Role.USER);
 
@@ -80,10 +82,12 @@ public class MemberService {
 
         if (ObjectUtils.isEmpty(refreshToken)) {
             log.info("잘못된 요청입니다."); //에러 처리
+            throw new UnauthorizedException("인증되지 않은 사용자의 요청입니다.");
         }
 
         if (!refreshToken.equals(dto.getRefreshToken())) {
             log.info("Refresh Token 정보 불일치"); //에러 처리
+            throw new UnauthorizedException("인증되지 않은 사용자의 요청입니다.");
         }
 
         TokenDto tokenDto = jwtProvider.createTokenDto(authentication);
@@ -98,6 +102,7 @@ public class MemberService {
     public void logout(TokenRequestDto dto) {
         if (!jwtProvider.validateToken(dto.getAccessToken())) {
             log.info("잘못된 요청입니다."); //에러 처리
+            throw new UnauthorizedException("인증되지 않은 사용자의 요청입니다.");
         }
 
         Authentication authentication = jwtProvider.getAuthentication(dto.getAccessToken());
@@ -112,5 +117,25 @@ public class MemberService {
                 .set(dto.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
     }
 
+    public MemberDuplicateCheckResponseDto duplicateCheck(String email) {
+        boolean duplicate = memberRepository.findByEmail(email).isPresent();
+        return MemberDuplicateCheckResponseDto.from(duplicate);
+    }
 
+    @Transactional
+    public EditMemberResponseDto editMember(EditMemberRequestDto editMemberRequestDto, Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException("회원정보를 찾을 수 없습니다."));
+
+        member.update(editMemberRequestDto.getName());
+
+        return EditMemberResponseDto.of(member);
+    }
+
+    @Transactional
+    public void withdrawMember(TokenRequestDto requestDto, Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException("회원정보를 찾을 수 없습니다."));
+
+        memberRepository.delete(member);
+        logout(requestDto);
+    }
 }

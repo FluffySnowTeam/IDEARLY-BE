@@ -17,7 +17,7 @@ import java.util.List;
 public class CompetitionParticipateResponseDto {
 
     private Long competitionId;
-    private String competitionTitle;
+    private String title;
     private Long teamId;
     private String teamName;
     private List<TeammateResponseDto> teammates;

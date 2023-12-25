@@ -1,5 +1,6 @@
 package fluffysnow.idearly.textchat.interceptor;
 
+import fluffysnow.idearly.common.exception.ForbiddenException;
 import fluffysnow.idearly.member.domain.Member;
 import fluffysnow.idearly.team.repository.MemberTeamRepository;
 import fluffysnow.idearly.textchat.common.TextChatContextHolder;
@@ -62,7 +63,7 @@ public class ChannelInboundInterceptor implements ChannelInterceptor {
             Long teamId = getTeamIdFromDestination(header.getDestination());
             log.info("teamId: {}", teamId);
 //            if (memberTeamRepository.findByMemberIdAndTeamId(member.getId(), teamId).isEmpty()) {
-//                throw new IllegalStateException("소속되지 않은 팀으로의 요청");
+//                throw new ForbiddenException("소속되지 않은 팀으로의 요청이 발생했습니다.");
 //            }
         }
     }
@@ -81,7 +82,7 @@ public class ChannelInboundInterceptor implements ChannelInterceptor {
             Long teamId = getTeamIdFromDestination(header.getDestination());
             log.info("teamId: {}", teamId);
 //            if (memberTeamRepository.findByMemberIdAndTeamId(member.getId(), teamId).isEmpty()) {
-//                throw new IllegalStateException("소속되지 않은 팀으로의 요청");
+//                throw new ForbiddenException("소속되지 않은 팀으로의 요청이 발생했습니다.");
 //            }
         }
     }

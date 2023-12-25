@@ -1,5 +1,7 @@
 package fluffysnow.idearly.competition.service;
 
+import fluffysnow.idearly.common.Role;
+import fluffysnow.idearly.common.exception.NotFoundException;
 import fluffysnow.idearly.competition.domain.Competition;
 import fluffysnow.idearly.competition.dto.*;
 import fluffysnow.idearly.competition.repository.CompetitionRepository;
@@ -10,7 +12,8 @@ import fluffysnow.idearly.member.service.MemberService;
 import fluffysnow.idearly.team.repository.MemberTeamRepository;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 
 @Transactional
@@ -42,37 +44,62 @@ class CompetitionServiceTest {
     @Autowired
     private MemberTeamRepository memberTeamRepository;
 
+    @BeforeEach
+    void beforeEach() {
+        Member member = new Member("aaa@naver.com", "관리자", "12345678", Role.ADMIN);
+        memberRepository.save(member);
+    }
+
+    @AfterEach
+    void afterEach() {
+        Member member = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다!"));
+        memberRepository.delete(member);
+    }
 
     @Test
     void createCompetition() {
         CompetitionCreateRequestDto createRequestDto = new CompetitionCreateRequestDto("대회 이름", "대회 설명", LocalDateTime.now(), LocalDateTime.now());
-        Competition competition = competitionService.createCompetition(createRequestDto, null);
+        Member member = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
+
+        Competition competition = competitionService.createCompetition(createRequestDto, member.getId());
 
         assertThat(competition.getId()).isNotNull();
     }
 
     @Test
     void competitionList() {
-        CompetitionCreateRequestDto createRequestDto1 = new CompetitionCreateRequestDto("대회 이름1", "대회 설명1", LocalDateTime.now(), LocalDateTime.now());
-        Competition competition1 = competitionService.createCompetition(createRequestDto1, null);
+        Member member = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
 
-        CompetitionCreateRequestDto createRequestDto2 = new CompetitionCreateRequestDto("대회 이름2", "대회 설명2", LocalDateTime.now(), LocalDateTime.now());
-        Competition competition2 = competitionService.createCompetition(createRequestDto2, null);
+        CompetitionCreateRequestDto createRequestDto1 = new CompetitionCreateRequestDto("대회 이름1", "대회 설명1", LocalDateTime.now(), LocalDateTime.now().plusDays(1L));
+        Competition competition1 = competitionService.createCompetition(createRequestDto1, member.getId());
+
+        CompetitionCreateRequestDto createRequestDto2 = new CompetitionCreateRequestDto("대회 이름2", "대회 설명2", LocalDateTime.now(), LocalDateTime.now().plusDays(1L));
+        Competition competition2 = competitionService.createCompetition(createRequestDto2, member.getId());
+
+        CompetitionCreateRequestDto createRequestDto3 = new CompetitionCreateRequestDto("대회 이름3", "대회 설명3", LocalDateTime.now().minusDays(1L), LocalDateTime.now().minusDays(1L));
+        Competition competition3 = competitionService.createCompetition(createRequestDto3, member.getId());
 
         em.flush();
         em.clear();
 
-        List<CompetitionResponseDto> competitionList = competitionService.getCompetitionList();
-        assertThat(competitionList.size()).isEqualTo(2);
+        List<CompetitionResponseDto> availableCompetitionList = competitionService.getCompetitionList(true);
+        assertThat(availableCompetitionList.size()).isEqualTo(2);
 
-        assertThat(competitionList.get(0).getCompetitionId()).isEqualTo(competition1.getId());
-        assertThat(competitionList.get(1).getCompetitionId()).isEqualTo(competition2.getId());
+        assertThat(availableCompetitionList.get(0).getCompetitionId()).isEqualTo(competition1.getId());
+        assertThat(availableCompetitionList.get(1).getCompetitionId()).isEqualTo(competition2.getId());
+
+        List<CompetitionResponseDto> unavailableCompetitionList = competitionService.getCompetitionList(false);
+        assertThat(unavailableCompetitionList.size()).isEqualTo(1);
+
+        assertThat(unavailableCompetitionList.get(0).getCompetitionId()).isEqualTo(competition3.getId());
     }
 
     @Test
     void competitionDetail() {
+        Member member = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
+
         CompetitionCreateRequestDto createRequestDto = new CompetitionCreateRequestDto("대회 이름", "대회 설명", LocalDateTime.now(), LocalDateTime.now());
-        Competition competition = competitionService.createCompetition(createRequestDto, null);
+        Competition competition = competitionService.createCompetition(createRequestDto, member.getId());
 
         em.flush();
         em.clear();
@@ -80,7 +107,7 @@ class CompetitionServiceTest {
         CompetitionDetailResponseDto competitionDetailResponse = competitionService.getCompetitionDetail(competition.getId(), null);
 
         assertThat(competitionDetailResponse.getCompetitionId()).isEqualTo(competition.getId());
-        assertThat(competitionDetailResponse.getCompetitionTitle()).isEqualTo(competition.getName());
+        assertThat(competitionDetailResponse.getTitle()).isEqualTo(competition.getName());
         assertThat(competitionDetailResponse.getDescription()).isEqualTo(competition.getDescription());
         assertThat(competitionDetailResponse.isLogin()).isFalse();
         assertThat(competitionDetailResponse.getTeamId()).isNull();
@@ -90,6 +117,8 @@ class CompetitionServiceTest {
 
     @Test
     void participateInCompetition() {
+        Member member = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
+
         MemberCreateRequestDto memberCreateDto1 = new MemberCreateRequestDto("a@a.com", "회원1", "123");
         MemberCreateRequestDto memberCreateDto2 = new MemberCreateRequestDto("b@b.com", "회원2", "123");
         MemberCreateRequestDto memberCreateDto3 = new MemberCreateRequestDto("c@c.com", "회원3", "123");
@@ -99,7 +128,7 @@ class CompetitionServiceTest {
         Member loginMember = memberRepository.findByEmail("a@a.com").get();
 
         CompetitionCreateRequestDto createRequestDto = new CompetitionCreateRequestDto("대회 이름", "대회 설명", LocalDateTime.now(), LocalDateTime.now());
-        Competition competition = competitionService.createCompetition(createRequestDto, null);
+        Competition competition = competitionService.createCompetition(createRequestDto, member.getId());
 
         TeammateRequestDto teammateRequest1 = new TeammateRequestDto("b@b.com", "회원2");
         TeammateRequestDto teammateRequest2 = new TeammateRequestDto("c@c.com", "회원3");
@@ -112,7 +141,7 @@ class CompetitionServiceTest {
         CompetitionParticipateResponseDto participateResponse = competitionService.participateInCompetition(competition.getId(), competitionParticipateRequest, loginMember.getId());
 
         assertThat(participateResponse.getCompetitionId()).isEqualTo(competition.getId());
-        assertThat(participateResponse.getCompetitionTitle()).isEqualTo(competition.getName());
+        assertThat(participateResponse.getTitle()).isEqualTo(competition.getName());
         assertThat(participateResponse.getTeamId()).isNotNull();
         assertThat(participateResponse.getTeammates().size()).isEqualTo(3);
         log.info("teammate1: {} {}", participateResponse.getTeammates().get(0).getEmail(), participateResponse.getTeammates().get(0).getInviteStatus());
@@ -122,6 +151,8 @@ class CompetitionServiceTest {
 
     @Test
     void invitableCheck() {
+        Member member = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
+
         MemberCreateRequestDto memberCreateDto1 = new MemberCreateRequestDto("a@a.com", "회원1", "123");
         MemberCreateRequestDto memberCreateDto2 = new MemberCreateRequestDto("b@b.com", "회원2", "123");
         MemberCreateRequestDto memberCreateDto3 = new MemberCreateRequestDto("c@c.com", "회원3", "123");
@@ -133,7 +164,7 @@ class CompetitionServiceTest {
         Member loginMember = memberRepository.findByEmail("a@a.com").get();
 
         CompetitionCreateRequestDto createRequestDto = new CompetitionCreateRequestDto("대회 이름", "대회 설명", LocalDateTime.now(), LocalDateTime.now());
-        Competition competition = competitionService.createCompetition(createRequestDto, null);
+        Competition competition = competitionService.createCompetition(createRequestDto, member.getId());
 
         TeammateRequestDto teammateRequest1 = new TeammateRequestDto("b@b.com", "회원2");
         TeammateRequestDto teammateRequest2 = new TeammateRequestDto("c@c.com", "회원3");

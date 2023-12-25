@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class CompetitionDetailResponseDto {
 
     private Long competitionId;
-    private String competitionTitle;
+    private String title;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
     private String description;
@@ -46,6 +46,9 @@ public class CompetitionDetailResponseDto {
                     null
             );
         } else {
+            // 수락된 상태라면 acceptInvitation은 true
+            // 초대만 받은 상태라면 acceptInvitation은 false이고 memberTeam.getTeam().getId()/memberTeam.getTeam().getName()만 나옴
+            boolean acceptInvitation = InviteStatus.ACCEPT.equals(memberTeam.getInviteStatus());
             return new CompetitionDetailResponseDto(
                     competition.getId(),
                     competition.getName(),
@@ -53,7 +56,7 @@ public class CompetitionDetailResponseDto {
                     competition.getEndDatetime(),
                     competition.getDescription(),
                     login,
-                    true,
+                    acceptInvitation,
                     memberTeam.getTeam().getId(),
                     memberTeam.getTeam().getName()
             );

@@ -1,6 +1,7 @@
 package fluffysnow.idearly.competition.service;
 
 
+import fluffysnow.idearly.common.exception.NotFoundException;
 import fluffysnow.idearly.competition.domain.Competition;
 import fluffysnow.idearly.competition.dto.*;
 import fluffysnow.idearly.competition.repository.CompetitionRepository;
@@ -15,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,12 +34,19 @@ public class CompetitionService {
 
 
     /**
-     * 메인페이지에서 대회 리스트를 조회
+     * 메인페이지에서 대회 리스트를 조회 - available에 따라 현재 참가 가능한 대회와 지난 대회를 반환
      */
     @Transactional(readOnly = true)
-    public List<CompetitionResponseDto> getCompetitionList() {
+    public List<CompetitionResponseDto> getCompetitionList(boolean available) {
 
-        List<Competition> competitionList = competitionRepository.findAll();
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        List<Competition> competitionList;
+        if (available) {
+            competitionList = competitionRepository.findAvailableCompetitionList(now);
+        } else {
+            competitionList = competitionRepository.findUnavailableCompetitionList(now);
+        }
+
         return CompetitionResponseDto.listFrom(competitionList);
     }
 
@@ -47,10 +57,10 @@ public class CompetitionService {
     public CompetitionDetailResponseDto getCompetitionDetail(Long competitionId, Long loginMemberId) {
 
         if (loginMemberId == null) {
-            Competition findCompetition = competitionRepository.findById(competitionId).orElseThrow();  //notFound
+            Competition findCompetition = competitionRepository.findById(competitionId).orElseThrow(() -> new NotFoundException("존재하지 않는 대회입니다."));  //notFound
             return CompetitionDetailResponseDto.of(findCompetition, false, null);
         } else {
-            Competition findCompetition = competitionRepository.findById(competitionId).orElseThrow();  //notFound
+            Competition findCompetition = competitionRepository.findById(competitionId).orElseThrow(() -> new NotFoundException("존재하지 않는 대회입니다."));  //notFound
             MemberTeam memberTeam = memberTeamRepository.findByMemberIdAndCompetitionId(loginMemberId, competitionId).orElse(null);
             return CompetitionDetailResponseDto.of(findCompetition, true, memberTeam);
         }
@@ -62,8 +72,8 @@ public class CompetitionService {
     public CompetitionParticipateResponseDto participateInCompetition(Long competitionId, CompetitionParticipateRequestDto requestDto, Long loginMemberId) {
 
         // 대회와 회원 정보 조회
-        Competition competition = competitionRepository.findById(competitionId).orElseThrow();  //notFound
-        Member loginMember = memberRepository.findById(loginMemberId).orElseThrow();    //notFound
+        Competition competition = competitionRepository.findById(competitionId).orElseThrow(() -> new NotFoundException("존재하지 않는 대회입니다."));  //notFound
+        Member loginMember = memberRepository.findById(loginMemberId).orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));    //notFound
         String teamName = requestDto.getTeamName();
 
         // 초대할 팀원의 이메일을 기준으로 팀원 리스트 생성
@@ -71,7 +81,9 @@ public class CompetitionService {
                 .getTeammates()
                 .stream()
                 .map(TeammateRequestDto::getEmail)
-                .map(email -> memberRepository.findByEmail(email).orElseThrow()).toList();  //notFound
+                .map(email -> memberRepository.findByEmail(email)
+                        .orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다.")))
+                .toList();  //notFound
 
         // 위 정보를 기준으로 팀 생성
         Team team = teamService.createTeam(competition, loginMember, teamName, teammates);
@@ -96,7 +108,9 @@ public class CompetitionService {
         return InvitableResponseDto.of(findMember, invitable);
     }
 
-    public Competition createCompetition(CompetitionCreateRequestDto requestDto, Member adminMember) {
+    public Competition createCompetition(CompetitionCreateRequestDto requestDto, Long adminMemberId) {
+
+        Member adminMember = memberRepository.findById(adminMemberId).orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
 
         Competition competition = new Competition(requestDto.getTitle(), requestDto.getDescription(), requestDto.getStartDateTime(), requestDto.getEndDateTime(), adminMember);
 

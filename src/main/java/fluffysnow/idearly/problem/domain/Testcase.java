@@ -28,4 +28,11 @@ public class Testcase {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "problem_id")
     private Problem problem;
+
+    public Testcase(String input, String answer, boolean hidden, Problem problem) {
+        this.input = input;
+        this.answer = answer;
+        this.hidden = hidden;
+        this.problem = problem;
+    }
 }

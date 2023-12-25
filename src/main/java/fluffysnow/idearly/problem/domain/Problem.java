@@ -20,13 +20,26 @@ public class Problem {
     @Column(name = "problem_id")
     private Long id;
 
+    private String name;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @JoinColumn(name = "competitionId")
+    @JoinColumn(name = "competition_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Competition competition;
 
     @OneToMany(mappedBy = "problem")
     private List<Testcase> testcases;
+
+    public Problem(String name, String description, Competition competition) {
+        this.name = name;
+        this.description = description;
+        this.competition = competition;
+    }
+
+    public void updateProblem(String name, String description){
+        this.name = name;
+        this.description = description;
+    }
 }

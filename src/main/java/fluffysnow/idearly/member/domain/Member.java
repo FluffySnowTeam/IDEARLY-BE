@@ -24,6 +24,7 @@ public class Member extends BaseEntity {
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR")
     private Role role;
 
     @Builder
@@ -32,5 +33,9 @@ public class Member extends BaseEntity {
         this.name = name;
         this.password = password;
         this.role = role;
+    }
+
+    public void update(String name) {
+        this.name =  name;
     }
 }

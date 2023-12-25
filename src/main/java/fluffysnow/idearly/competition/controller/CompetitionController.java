@@ -21,18 +21,18 @@ public class CompetitionController {
 
     private final CompetitionService competitionService;
 
-    @GetMapping("/login")
-    public Long getLoginMemberIdTest() {
-        return getLoginMemberId();
-    }
+//    @GetMapping("/login")
+//    public Long getLoginMemberIdTest() {
+//        return getLoginMemberId();
+//    }
 
     /**
      * 메인페이지에서 대회의 리스트를 조회
      */
     @GetMapping
-    public ApiResponse<List<CompetitionResponseDto>> getCompetitionList() {
+    public ApiResponse<List<CompetitionResponseDto>> getCompetitionList(@RequestParam(value = "available", defaultValue = "true") boolean available) {
 
-        List<CompetitionResponseDto> competitionResponseDtoList = competitionService.getCompetitionList();
+        List<CompetitionResponseDto> competitionResponseDtoList = competitionService.getCompetitionList(available);
 
         return ApiResponse.ok(competitionResponseDtoList);
     }
@@ -85,7 +85,8 @@ public class CompetitionController {
     private static Long getLoginMemberId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long loginMemberId = null;
-        if (authentication != null && authentication.isAuthenticated()) {
+
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
             // 인증 정보 사용
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
             loginMemberId = customUserDetails.getMemberId();

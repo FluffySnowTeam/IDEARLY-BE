@@ -1,9 +1,6 @@
 package fluffysnow.idearly.admin.controller;
 
-import fluffysnow.idearly.admin.dto.ProblemCreateRequestDto;
-import fluffysnow.idearly.admin.dto.ProblemCreateResponseDto;
-import fluffysnow.idearly.admin.dto.TestcaseCreateRequestDto;
-import fluffysnow.idearly.admin.dto.TestcaseCreateResponseDto;
+import fluffysnow.idearly.admin.dto.*;
 import fluffysnow.idearly.admin.service.AdminService;
 import fluffysnow.idearly.common.ApiResponse;
 import fluffysnow.idearly.competition.dto.CompetitionCreateRequestDto;
@@ -14,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -46,6 +45,14 @@ public class AdminController {
     public ApiResponse<TestcaseCreateResponseDto> createTestcase(@RequestBody TestcaseCreateRequestDto requestDto, @PathVariable("problemId") Long problemId) {
 
         TestcaseCreateResponseDto responseDto = adminService.createTestcase(requestDto, problemId);
+
+        return ApiResponse.ok(responseDto);
+    }
+
+    @GetMapping("/members")
+    public ApiResponse<List<MemberListResponseDto>> getMembersDetail() {
+
+        List<MemberListResponseDto> responseDto = adminService.getMemberInformation();
 
         return ApiResponse.ok(responseDto);
     }

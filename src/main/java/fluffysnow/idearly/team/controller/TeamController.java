@@ -2,10 +2,7 @@ package fluffysnow.idearly.team.controller;
 
 import fluffysnow.idearly.common.ApiResponse;
 import fluffysnow.idearly.config.CustomUserDetails;
-import fluffysnow.idearly.team.dto.TeamDetailResponseDto;
-import fluffysnow.idearly.team.dto.TeamEditRequestDto;
-import fluffysnow.idearly.team.dto.TeamInviteAcceptRequestDto;
-import fluffysnow.idearly.team.dto.TeamResponseDto;
+import fluffysnow.idearly.team.dto.*;
 import fluffysnow.idearly.team.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,17 +53,17 @@ public class TeamController {
      * 팀 초대 수락 혹은 거절
      */
     @PostMapping("/{teamId}")
-    public ApiResponse<TeamDetailResponseDto> acceptOrDenyTeamInvite(@RequestBody TeamInviteAcceptRequestDto requestDto,
-                                                                     @PathVariable("teamId") Long teamId) {
+    public ApiResponse<TeamInviteAcceptResponseDto> acceptOrDenyTeamInvite(@RequestBody TeamInviteAcceptRequestDto requestDto,
+                                                                           @PathVariable("teamId") Long teamId) {
         Long loginMemberId = getLoginMemberId();
 
         if (requestDto.isAccept()) {
-            teamService.acceptInvite(teamId, loginMemberId);
-            TeamDetailResponseDto teamDetailResponseDto = teamService.getTeamDetail(teamId, loginMemberId);
-            return ApiResponse.ok(teamDetailResponseDto);
+            TeamInviteAcceptResponseDto teamInviteAcceptResponseDto = teamService.acceptInvite(teamId, loginMemberId);
+//            TeamDetailResponseDto teamDetailResponseDto = teamService.getTeamDetail(teamId, loginMemberId);
+            return ApiResponse.ok(teamInviteAcceptResponseDto);
         } else {
-            teamService.denyInvite(teamId, loginMemberId);
-            return ApiResponse.ok(null);
+            TeamInviteAcceptResponseDto teamInviteAcceptResponseDto = teamService.denyInvite(teamId, loginMemberId);
+            return ApiResponse.ok(teamInviteAcceptResponseDto);
         }
     }
 

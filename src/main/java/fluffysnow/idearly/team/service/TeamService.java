@@ -12,6 +12,7 @@ import fluffysnow.idearly.team.domain.MemberTeam;
 import fluffysnow.idearly.team.domain.Team;
 import fluffysnow.idearly.team.dto.TeamDetailResponseDto;
 import fluffysnow.idearly.team.dto.TeamEditRequestDto;
+import fluffysnow.idearly.team.dto.TeamInviteAcceptResponseDto;
 import fluffysnow.idearly.team.dto.TeamResponseDto;
 import fluffysnow.idearly.team.repository.MemberTeamRepository;
 import fluffysnow.idearly.team.repository.TeamRepository;
@@ -102,15 +103,17 @@ public class TeamService {
     }
 
     // 초대 수락
-    public void acceptInvite(Long teamId, Long loginMemberId) {
+    public TeamInviteAcceptResponseDto acceptInvite(Long teamId, Long loginMemberId) {
         MemberTeam memberTeam = memberTeamRepository.findByMemberIdAndTeamId(loginMemberId, teamId).orElseThrow(() -> new NotFoundException("회원 정보와 팀 정보가 일치하지 않습니다."));  //NotFound
         memberTeam.acceptInvitation();
+        return TeamInviteAcceptResponseDto.from(teamId, true);
     }
 
     // 초대 거절
-    public void denyInvite(Long teamId, Long loginMemberId) {
+    public TeamInviteAcceptResponseDto denyInvite(Long teamId, Long loginMemberId) {
         MemberTeam memberTeam = memberTeamRepository.findByMemberIdAndTeamId(loginMemberId, teamId).orElseThrow(() -> new NotFoundException("회원 정보와 팀 정보가 일치하지 않습니다."));  //NotFound
         memberTeamRepository.delete(memberTeam);
+        return TeamInviteAcceptResponseDto.from(teamId, false);
     }
 
     // 팀 구성원 변경

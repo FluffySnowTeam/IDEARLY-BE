@@ -57,6 +57,14 @@ public class AdminController {
         return ApiResponse.ok(responseDto);
     }
 
+    @GetMapping("/{competitionId}")
+    public ApiResponse<List<ProblemsResponseDto>> getProblemsDetail(@PathVariable("competitionId") Long competitionId) {
+
+        List<ProblemsResponseDto> problemDetail = adminService.getProblemDetail(competitionId);
+
+        return ApiResponse.ok(problemDetail);
+    }
+
     private static Long getLoginMemberId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long loginMemberId = null;

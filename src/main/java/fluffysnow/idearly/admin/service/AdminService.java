@@ -73,4 +73,11 @@ public class AdminService {
 
         return memberListResponseDtos;
     }
+
+    public List<ProblemsResponseDto> getProblemDetail(Long competitionId) {
+
+        List<Problem> problems = problemRepository.findProblemByCompetitionId(competitionId);
+
+        return ProblemsResponseDto.listFrom(problems);
+    }
 }

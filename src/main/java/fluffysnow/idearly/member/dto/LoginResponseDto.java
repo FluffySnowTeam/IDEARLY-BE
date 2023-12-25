@@ -15,6 +15,7 @@ public class LoginResponseDto {
     private Long memberId;
     private String email;
     private String name;
+    private String authority;
     @JsonIgnore
     private String accessToken;
     @JsonIgnore
@@ -25,6 +26,7 @@ public class LoginResponseDto {
                 customUserDetails.getMemberId(),
                 customUserDetails.getUsername(),
                 customUserDetails.getName(),
+                tokenDto.getAuthority(),
                 tokenDto.getAccessToken(),
                 tokenDto.getRefreshToken()
         );

@@ -1,6 +1,5 @@
 package fluffysnow.idearly.problem.domain;
 
-import fluffysnow.idearly.common.BaseEntity;
 import fluffysnow.idearly.common.Language;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "template")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Template extends BaseEntity {
+public class Template {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "template_id")
@@ -28,9 +27,9 @@ public class Template extends BaseEntity {
     @JoinColumn(name = "problem_id")
     private Problem problem;
 
-public Template(Language language, String code, Problem problem) {
-        this.language = language;
-        this.code = code;
-        this.problem = problem;
+    public Template(Language language, String code, Problem problem) {
+            this.language = language;
+            this.code = code;
+            this.problem = problem;
     }
 }

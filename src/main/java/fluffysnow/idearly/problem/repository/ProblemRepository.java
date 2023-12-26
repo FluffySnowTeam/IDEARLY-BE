@@ -1,8 +1,6 @@
 package fluffysnow.idearly.problem.repository;
 
 import fluffysnow.idearly.problem.domain.Problem;
-import fluffysnow.idearly.problem.domain.Testcase;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

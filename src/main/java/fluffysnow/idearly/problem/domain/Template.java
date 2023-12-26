@@ -27,4 +27,10 @@ public class Template extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "problem_id")
     private Problem problem;
+
+public Template(Language language, String code, Problem problem) {
+        this.language = language;
+        this.code = code;
+        this.problem = problem;
+    }
 }

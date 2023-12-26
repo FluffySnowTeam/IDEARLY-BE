@@ -44,13 +44,13 @@ public class MemberController {
         LoginResponseDto loginResponseDto = memberService.login(loginRequestDto);
         Cookie accessTokenCookie = new Cookie("accessToken", loginResponseDto.getAccessToken());
         accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(60 * 60 * 3); // 액세스 토큰: 3시간
+        accessTokenCookie.setMaxAge(60 * 60 * 24 * 7); // 액세스 토큰: 7일
         accessTokenCookie.setSecure(true);
         accessTokenCookie.setHttpOnly(true);
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", loginResponseDto.getRefreshToken());
         refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(60 * 60 * 3); // 리프레쉬 토큰: 3시간
+        refreshTokenCookie.setMaxAge(60 * 60 * 24 * 7); // 리프레쉬 토큰: 7일
         refreshTokenCookie.setSecure(true);
         refreshTokenCookie.setHttpOnly(true);
 
@@ -66,13 +66,13 @@ public class MemberController {
         TokenDto tokenDto = memberService.reissue(tokenRequestDto);
         Cookie accessTokenCookie = new Cookie("accessToken", tokenDto.getAccessToken());
         accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(60 * 60 * 3); // 액세스 토큰: 3시간
+        accessTokenCookie.setMaxAge(60 * 60 * 24 * 7); // 액세스 토큰: 7일
         accessTokenCookie.setSecure(true);
         accessTokenCookie.setHttpOnly(true);
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
         refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(60 * 60 * 3); // 리프레쉬 토큰: 3시간
+        refreshTokenCookie.setMaxAge(60 * 60 * 24 * 7); // 리프레쉬 토큰: 7일
         refreshTokenCookie.setSecure(true);
         refreshTokenCookie.setHttpOnly(true);
 
@@ -87,11 +87,11 @@ public class MemberController {
         memberService.logout(tokenRequestDto);
         Cookie accessTokenCookie = new Cookie("accessToken", "None");
         accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(0); // 액세스 토큰: 3시간
+        accessTokenCookie.setMaxAge(0); // 액세스 토큰 삭제
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", "None");
         refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(0); // 리프레쉬 토큰: 3시간
+        refreshTokenCookie.setMaxAge(0); // 리프레쉬 토큰 삭제
 
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
@@ -116,11 +116,11 @@ public class MemberController {
 
         Cookie accessTokenCookie = new Cookie("accessToken", "None");
         accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(0); // 액세스 토큰: 3시간
+        accessTokenCookie.setMaxAge(0); // 액세스 토큰 삭제
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", "None");
         refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(0); // 리프레쉬 토큰: 3시간
+        refreshTokenCookie.setMaxAge(0); // 리프레쉬 토큰 삭제
 
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);

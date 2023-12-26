@@ -46,7 +46,8 @@ public class ProblemController {
      */
     @PostMapping("/{competitionId}/problems/{problemId}")
     public ApiResponse<SubmitResponseDto> submitcode(@PathVariable("competitionId") Long competitionId, @PathVariable("problemId") Long problemId, @RequestBody SubmitAndTestcaseCreateRequestDto submitAndTestcaseCreateRequestDto) {
-        SubmitResponseDto submit = submitService.createSubmit(competitionId, problemId, submitAndTestcaseCreateRequestDto);
+        Long loginMemberId = getLoginMemberId();
+        SubmitResponseDto submit = submitService.createSubmit(loginMemberId, competitionId, problemId, submitAndTestcaseCreateRequestDto);
 
         return ApiResponse.ok(submit);
     }
@@ -60,7 +61,8 @@ public class ProblemController {
      */
     @PostMapping("/{competitionId}/problems/{problemId}/test")
     public ApiResponse<TestcaseResponseDto> testcode(@PathVariable("competitionId") Long competitionId, @PathVariable("problemId") Long problemId, @RequestBody SubmitAndTestcaseCreateRequestDto submitAndTestcaseCreateRequestDto) {
-        TestcaseResponseDto testcaseResponseDto = testcaseService.ExecuteTestcase(competitionId, problemId, submitAndTestcaseCreateRequestDto);
+        Long loginMemberId = getLoginMemberId();
+        TestcaseResponseDto testcaseResponseDto = testcaseService.ExecuteTestcase(loginMemberId, competitionId, problemId, submitAndTestcaseCreateRequestDto);
 
         return ApiResponse.ok(testcaseResponseDto);
     }

@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,12 +34,19 @@ public class CompetitionService {
 
 
     /**
-     * 메인페이지에서 대회 리스트를 조회
+     * 메인페이지에서 대회 리스트를 조회 - available에 따라 현재 참가 가능한 대회와 지난 대회를 반환
      */
     @Transactional(readOnly = true)
-    public List<CompetitionResponseDto> getCompetitionList() {
+    public List<CompetitionResponseDto> getCompetitionList(boolean available) {
 
-        List<Competition> competitionList = competitionRepository.findAll();
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        List<Competition> competitionList;
+        if (available) {
+            competitionList = competitionRepository.findAvailableCompetitionList(now);
+        } else {
+            competitionList = competitionRepository.findUnavailableCompetitionList(now);
+        }
+
         return CompetitionResponseDto.listFrom(competitionList);
     }
 

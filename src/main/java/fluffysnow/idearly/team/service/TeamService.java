@@ -12,6 +12,7 @@ import fluffysnow.idearly.team.domain.MemberTeam;
 import fluffysnow.idearly.team.domain.Team;
 import fluffysnow.idearly.team.dto.TeamDetailResponseDto;
 import fluffysnow.idearly.team.dto.TeamEditRequestDto;
+import fluffysnow.idearly.team.dto.TeamInviteAcceptResponseDto;
 import fluffysnow.idearly.team.dto.TeamResponseDto;
 import fluffysnow.idearly.team.repository.MemberTeamRepository;
 import fluffysnow.idearly.team.repository.TeamRepository;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 
@@ -70,8 +72,7 @@ public class TeamService {
     @Transactional(readOnly = true)
     public List<TeamResponseDto> getBelongTeamList(Long loginMemberId) {
 
-        LocalDateTime now = LocalDateTime.now();
-        log.info("now: {}", now);
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         List<MemberTeam> memberTeamList = memberTeamRepository.findAvailableBelongMemberTeamByMemberId(loginMemberId, now);
         List<Team> teams = memberTeamList.stream().map(MemberTeam::getTeam).toList();
 
@@ -81,7 +82,7 @@ public class TeamService {
     @Transactional(readOnly = true)
     public List<TeamResponseDto> getInviteTeamList(Long loginMemberId) {
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         List<MemberTeam> memberTeamList = memberTeamRepository.findAvailableInviteMemberTeamByMemberId(loginMemberId, now);
         List<Team> teams = memberTeamList.stream().map(MemberTeam::getTeam).toList();
 
@@ -102,15 +103,17 @@ public class TeamService {
     }
 
     // 초대 수락
-    public void acceptInvite(Long teamId, Long loginMemberId) {
+    public TeamInviteAcceptResponseDto acceptInvite(Long teamId, Long loginMemberId) {
         MemberTeam memberTeam = memberTeamRepository.findByMemberIdAndTeamId(loginMemberId, teamId).orElseThrow(() -> new NotFoundException("회원 정보와 팀 정보가 일치하지 않습니다."));  //NotFound
         memberTeam.acceptInvitation();
+        return TeamInviteAcceptResponseDto.from(teamId, true);
     }
 
     // 초대 거절
-    public void denyInvite(Long teamId, Long loginMemberId) {
+    public TeamInviteAcceptResponseDto denyInvite(Long teamId, Long loginMemberId) {
         MemberTeam memberTeam = memberTeamRepository.findByMemberIdAndTeamId(loginMemberId, teamId).orElseThrow(() -> new NotFoundException("회원 정보와 팀 정보가 일치하지 않습니다."));  //NotFound
         memberTeamRepository.delete(memberTeam);
+        return TeamInviteAcceptResponseDto.from(teamId, false);
     }
 
     // 팀 구성원 변경

@@ -3,6 +3,7 @@ package fluffysnow.idearly.problem.service;
 import fluffysnow.idearly.common.Language;
 import fluffysnow.idearly.common.exception.NotFoundException;
 import fluffysnow.idearly.problem.domain.Problem;
+import fluffysnow.idearly.problem.dto.ProblemIdListResponseDto;
 import fluffysnow.idearly.problem.dto.ProblemResponseDto;
 import fluffysnow.idearly.problem.repository.ProblemRepository;
 import fluffysnow.idearly.problem.repository.SubmitRepository;
@@ -12,6 +13,8 @@ import fluffysnow.idearly.team.repository.MemberTeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -52,4 +55,10 @@ public class ProblemService {
     }
 
 
+    public ProblemIdListResponseDto getProblemIdList(Long competitionId) {
+
+        List<Problem> problems = problemRepository.findProblemByCompetitionId(competitionId);
+
+        return ProblemIdListResponseDto.from(problems);
+    }
 }

@@ -1,5 +1,6 @@
 package fluffysnow.idearly.problem.service;
 
+import fluffysnow.idearly.common.exception.NotFoundException;
 import fluffysnow.idearly.config.CustomUserDetails;
 import fluffysnow.idearly.problem.compile.ExecuteDocker;
 import fluffysnow.idearly.problem.domain.Problem;
@@ -48,12 +49,13 @@ public class TestcaseService {
 
         // competitionId랑 memberId로 memberTeam을 가져옵니다.
         MemberTeam memberTeam = memberTeamRepository.findByMemberIdAndCompetitionId(memberId, competitionId)
-                .orElseThrow(() -> new IllegalArgumentException("대회에 참여한 팀을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("대회에 참여한 팀을 찾을 수 없습니다."));
 
         // memberTeam에서 team을 가져옵니다.
         Team team = memberTeam.getTeam();
 
-        Problem problem = problemRepository.findById(problemId).orElseThrow();
+        Problem problem = problemRepository.findById(problemId)
+                .orElseThrow(() -> new NotFoundException("문제를 찾을 수 없습니다."));
 
         // problemId에 hidden이 false인 테스트 케이스만 가져옵니다.
         List<Testcase> limitedTestCases = testcaseRepository.findNonHiddenTestcaseByProblemId(problemId);

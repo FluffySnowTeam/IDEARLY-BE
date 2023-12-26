@@ -1,6 +1,7 @@
 package fluffysnow.idearly.problem.service;
 
 import fluffysnow.idearly.common.Language;
+import fluffysnow.idearly.common.exception.NotFoundException;
 import fluffysnow.idearly.problem.domain.Problem;
 import fluffysnow.idearly.problem.dto.ProblemResponseDto;
 import fluffysnow.idearly.problem.repository.ProblemRepository;
@@ -31,11 +32,11 @@ public class ProblemService {
     @Transactional(readOnly = true)
     public ProblemResponseDto getProblem(Long loginMemberId, Long competitionId, Long problemId, Language language) {
         Problem problem = problemRepository.findByIdAndCompetitionId(competitionId, problemId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 문제를 찾을수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("해당 문제를 찾을수 없습니다."));
 
         // 현재 로그인한 사용자가 속한 팀을 가져옵니다.
         MemberTeam memberTeam = memberTeamRepository.findByMemberIdAndCompetitionId(loginMemberId, competitionId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 경진대회에 참여한 팀을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("해당 경진대회에 참여한 팀을 찾을 수 없습니다."));
 
         // 해당 언어의 문제에 대한 팀의 마지막 제출을 찾습니다.
         String code = submitRepository.findByLatestCodeByProblemIdAndTeamIdAndLanguage(problemId, memberTeam.getTeam().getId(), language)
@@ -44,7 +45,7 @@ public class ProblemService {
                     // 해당 언어의 문제에 대한 팀의 마지막 제출이 없다면 기본 템플릿 코드를 제공합니다.
                     return templateRepository.findByProblemIdAndLanguage(problemId, language)
                             .map(template -> template.getCode())
-                            .orElseThrow(() -> new IllegalArgumentException("기본 템플릿 코드를 찾을 수 없습니다."));
+                            .orElseThrow(() -> new NotFoundException("기본 템플릿 코드를 찾을 수 없습니다."));
                 });
 
         return ProblemResponseDto.of(problem.getName(), problem.getDescription(), code);

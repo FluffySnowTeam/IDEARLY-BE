@@ -2,6 +2,7 @@ package fluffysnow.idearly.problem.controller;
 
 import fluffysnow.idearly.common.ApiResponse;
 import fluffysnow.idearly.common.Language;
+import fluffysnow.idearly.config.CustomUserDetails;
 import fluffysnow.idearly.problem.dto.ProblemResponseDto;
 import fluffysnow.idearly.problem.dto.Testcase.TestcaseResponseDto;
 import fluffysnow.idearly.problem.dto.submit.SubmitResponseDto;
@@ -10,6 +11,8 @@ import fluffysnow.idearly.problem.service.ProblemService;
 import fluffysnow.idearly.problem.service.SubmitService;
 import fluffysnow.idearly.problem.service.TestcaseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,7 +32,8 @@ public class ProblemController {
      */
     @GetMapping("/{competitionId}/problems/{problemId}")
     public ApiResponse<ProblemResponseDto> getProblem(@PathVariable("competitionId") Long competitionId, @PathVariable("problemId") Long problemId, Language language) {
-        ProblemResponseDto problem = problemService.getProblem(competitionId, problemId, language);
+        Long loginMemberId = getLoginMemberId();
+        ProblemResponseDto problem = problemService.getProblem(loginMemberId, competitionId, problemId, language);
         return ApiResponse.ok(problem);
     }
 
@@ -59,5 +63,21 @@ public class ProblemController {
         TestcaseResponseDto testcaseResponseDto = testcaseService.ExecuteTestcase(competitionId, problemId, submitAndTestcaseCreateRequestDto);
 
         return ApiResponse.ok(testcaseResponseDto);
+    }
+
+
+    /**
+     * memberId를 SecurityContextHolder에서 가져옵니다.
+     * @return : memberId를 반환합니다.
+     */
+    private static Long getLoginMemberId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long loginMemberId = null;
+        if (authentication != null && authentication.isAuthenticated()) {
+            // 인증 정보 사용
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            loginMemberId = customUserDetails.getMemberId();
+        }
+        return loginMemberId;
     }
 }

@@ -13,6 +13,10 @@ import fluffysnow.idearly.problem.domain.Problem;
 import fluffysnow.idearly.problem.domain.Testcase;
 import fluffysnow.idearly.problem.repository.ProblemRepository;
 import fluffysnow.idearly.problem.repository.TestcaseRepository;
+import fluffysnow.idearly.team.domain.MemberTeam;
+import fluffysnow.idearly.team.domain.Team;
+import fluffysnow.idearly.team.repository.MemberTeamRepository;
+import fluffysnow.idearly.team.repository.TeamRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,6 +45,10 @@ class AdminServiceTest {
     private ProblemRepository problemRepository;
     @Autowired
     private TestcaseRepository testcaseRepository;
+    @Autowired
+    private TeamRepository teamRepository;
+    @Autowired
+    private MemberTeamRepository memberTeamRepository;
 
     @Test
     @DisplayName("문제 생성 성공 확인")
@@ -96,5 +104,64 @@ class AdminServiceTest {
         assertEquals(testcase2.getAnswer(), "정답2");
         assertFalse(testcase2.isHidden());
         assertEquals(testcase2.getProblem().getId(), problem.getId());
+    }
+
+    @Test
+    @DisplayName("멤버 전체조회 확인")
+    void getMemberInformationTest() {
+        Member admin = new Member("ccc@naver.com", "관리자", "12345678", Role.ADMIN);
+        Member member1 = new Member("aaa@naver.com", "사용자1", "12345678", Role.USER);
+        Member member2 = new Member("bbb@naver.com", "사용자2", "12345678", Role.USER);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        memberRepository.save(admin);
+        Member memberInfo1 = memberRepository.findByEmail("aaa@naver.com").orElseThrow(() -> new NotFoundException("회원정보가 없습니다"));
+        Member memberInfo2 = memberRepository.findByEmail("bbb@naver.com").orElseThrow(() -> new NotFoundException("회원정보가 없습니다"));
+        Member adminInfo = memberRepository.findByEmail("ccc@naver.com").orElseThrow(() -> new NotFoundException("회원정보가 없습니다"));
+
+        CompetitionCreateRequestDto competitionCreateRequestDto = new CompetitionCreateRequestDto("대회", "대회 설명", LocalDateTime.now(), LocalDateTime.now());
+        Competition competition = competitionService.createCompetition(competitionCreateRequestDto, adminInfo.getId());
+
+        Team team = new Team("팀1", memberInfo1, competition);
+        Team teamInfo = teamRepository.save(team);
+
+        MemberTeam memberTeam1 = new MemberTeam(memberInfo1, teamInfo, competition);
+        MemberTeam memberTeam2 = new MemberTeam(memberInfo2, teamInfo, competition);
+        memberTeamRepository.save(memberTeam1);
+        memberTeamRepository.save(memberTeam2);
+
+        List<MemberListResponseDto> memberInformation = adminService.getMemberInformation();
+        assertEquals(memberInformation.get(0).getMemberId(), memberInfo1.getId());
+        assertEquals(memberInformation.get(0).getEmail(), memberInfo1.getEmail());
+        assertEquals(memberInformation.get(0).getCompetitionTitleList().get(0), "대회");
+        assertEquals(memberInformation.get(0).getTeamNameList().get(0), "팀1");
+        assertEquals(memberInformation.get(1).getMemberId(), memberInfo2.getId());
+        assertEquals(memberInformation.get(1).getEmail(), memberInfo2.getEmail());
+        assertEquals(memberInformation.get(1).getCompetitionTitleList().get(0), "대회");
+        assertEquals(memberInformation.get(1).getTeamNameList().get(0), "팀1");
+    }
+
+    @Test
+    @DisplayName("대회기준 문제조회")
+    void getProblemDetailTest() {
+        Member member = new Member("aaa@naver.com", "관리자", "12345678", Role.ADMIN);
+        Member admin = memberRepository.save(member);
+
+        CompetitionCreateRequestDto competitionCreateRequestDto = new CompetitionCreateRequestDto("대회", "대회 설명", LocalDateTime.now(), LocalDateTime.now());
+        Competition competition = competitionService.createCompetition(competitionCreateRequestDto, admin.getId());
+
+        Problem problem1 = new Problem("제목1", "문제설명1", competition);
+        Problem problem2 = new Problem("제목2", "문제설명2", competition);
+        Problem problemInfo1 = problemRepository.save(problem1);
+        Problem problemInfo2 = problemRepository.save(problem2);
+
+        List<ProblemsResponseDto> problemDetail = adminService.getProblemDetail(competition.getId());
+
+        assertEquals(problemDetail.get(0).getId(), problemInfo1.getId());
+        assertEquals(problemDetail.get(0).getName(), "제목1");
+        assertEquals(problemDetail.get(0).getDescription(), "문제설명1");
+        assertEquals(problemDetail.get(1).getId(), problemInfo2.getId());
+        assertEquals(problemDetail.get(1).getName(), "제목2");
+        assertEquals(problemDetail.get(1).getDescription(), "문제설명2");
     }
 }

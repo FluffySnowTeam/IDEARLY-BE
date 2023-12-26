@@ -57,7 +57,7 @@ public class AdminController {
         return ApiResponse.ok(responseDto);
     }
 
-    @GetMapping("/{competitionId}")
+    @GetMapping("/competitions/{competitionId}/problems")
     public ApiResponse<List<ProblemsResponseDto>> getProblemsDetail(@PathVariable("competitionId") Long competitionId) {
 
         List<ProblemsResponseDto> problemDetail = adminService.getProblemDetail(competitionId);

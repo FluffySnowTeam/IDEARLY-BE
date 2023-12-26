@@ -61,8 +61,7 @@ public class ProblemController {
      */
     @PostMapping("/{competitionId}/problems/{problemId}/test")
     public ApiResponse<TestcaseResponseDto> testcode(@PathVariable("competitionId") Long competitionId, @PathVariable("problemId") Long problemId, @RequestBody SubmitAndTestcaseCreateRequestDto submitAndTestcaseCreateRequestDto) {
-        Long loginMemberId = getLoginMemberId();
-        TestcaseResponseDto testcaseResponseDto = testcaseService.ExecuteTestcase(loginMemberId, competitionId, problemId, submitAndTestcaseCreateRequestDto);
+        TestcaseResponseDto testcaseResponseDto = testcaseService.executeTestcase(problemId, submitAndTestcaseCreateRequestDto);
 
         return ApiResponse.ok(testcaseResponseDto);
     }

@@ -47,9 +47,12 @@ public class AdminService {
 
         Problem problem = problemRepository.findById(problemId).orElseThrow(() -> new NotFoundException("문제를 찾을 수 없습니다."));
         List<TestcasesInfoDto> testcasesInfo = requestDto.getTestcase();
+        log.info("테스트케이스 리스트 dto 생성 완료");
 
         for (TestcasesInfoDto infoDto : testcasesInfo) {
+            log.info(infoDto.toString());
             Testcase testcase = new Testcase(infoDto.getInput(), infoDto.getAnswer(), infoDto.getHidden(), problem);
+            log.info(testcase.getInput(), testcase.getAnswer());
             testcaseRepository.save(testcase);
         }
 

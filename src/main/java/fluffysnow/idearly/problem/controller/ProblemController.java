@@ -3,6 +3,7 @@ package fluffysnow.idearly.problem.controller;
 import fluffysnow.idearly.common.ApiResponse;
 import fluffysnow.idearly.common.Language;
 import fluffysnow.idearly.config.CustomUserDetails;
+import fluffysnow.idearly.problem.dto.ProblemIdListResponseDto;
 import fluffysnow.idearly.problem.dto.ProblemResponseDto;
 import fluffysnow.idearly.problem.dto.Testcase.TestcaseResponseDto;
 import fluffysnow.idearly.problem.dto.submit.SubmitResponseDto;
@@ -22,6 +23,19 @@ public class ProblemController {
     private final SubmitService submitService;
     private final TestcaseService testcaseService;
     private final ProblemService problemService;
+
+
+    /**
+     * 대기실에서 문제 id 들을 조회
+     */
+    @GetMapping("/{competitionId}/problems")
+    public ApiResponse<ProblemIdListResponseDto> getProblem(@PathVariable("competitionId") Long competitionId) {
+
+        ProblemIdListResponseDto responseDto = problemService.getProblemIdList(competitionId);
+
+        return ApiResponse.ok(responseDto);
+    }
+
 
     /**
      * 알고리즘 문제 조회

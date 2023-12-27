@@ -1,6 +1,7 @@
 package fluffysnow.idearly.team.service;
 
 
+import fluffysnow.idearly.common.exception.BadRequestException;
 import fluffysnow.idearly.common.exception.ForbiddenException;
 import fluffysnow.idearly.common.exception.NotFoundException;
 import fluffysnow.idearly.common.exception.TeamNameDuplicateException;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 
 @Transactional
@@ -44,6 +46,18 @@ public class TeamService {
         if (!availableTeamName(competition, teamName)) {
             throw new TeamNameDuplicateException("이미 존재하는 팀 이름입니다.");   //이름 중복 예외
         }
+
+        Optional<MemberTeam> memberTeamOptional = memberTeamRepository.findByMemberIdAndCompetitionId(leader.getId(), competition.getId());
+        if (memberTeamOptional.isPresent()) {
+            throw new BadRequestException("이미 해당 대회에서 소속된 팀이나 초대받은 팀이 존재합니다.");
+        }
+        teammates.forEach(tm -> {
+            Optional<MemberTeam> teammateTeamOptional = memberTeamRepository.findByMemberIdAndCompetitionId(tm.getId(), competition.getId());
+            if (teammateTeamOptional.isPresent()) {
+                throw new BadRequestException("초대할 수 없는 팀원입니다.");
+            }
+        });
+
 
         // 팀 이름, 팀장, 대회 정보를 기준으로 팀 생성 및 저장
         Team team = new Team(teamName, leader, competition);

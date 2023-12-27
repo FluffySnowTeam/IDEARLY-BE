@@ -53,8 +53,8 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/api/login", "/api/signup", "/api/competitions").permitAll()
-                                .requestMatchers(HttpMethod.GET, "api/competitions/{competitionId}").permitAll()
+                            .requestMatchers("/api/login", "/api/signup/**", "/api/competitions", "/api/reissue").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/competitions/{competitionId}").permitAll()
                                 .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                                 .anyRequest().authenticated()
                 );
@@ -62,8 +62,8 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new JwtFilter(jwtProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
-        http    .exceptionHandling(configurer -> configurer.authenticationEntryPoint(customAuthenticationEntryPoint)
-                .accessDeniedHandler(customAccessdeniedHandler));
+//        http    .exceptionHandling(configurer -> configurer.authenticationEntryPoint(customAuthenticationEntryPoint)
+//                .accessDeniedHandler(customAccessdeniedHandler));
         return http.build();
     }
 

@@ -47,7 +47,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             if (cookieRefreshToken.equals(refreshToken)) {
 
-                log.info("리이슈 처리중");
+                log.info("토큰 재발급 중");
 
                 TokenRequestDto tokenRequestDto = new TokenRequestDto(cookieAccessToken, refreshToken);
 
@@ -65,10 +65,8 @@ public class JwtFilter extends OncePerRequestFilter {
             /*1. Redis 에 해당 accessToken logout 여부 확인 */
             String isLogout = redisTemplate.opsForValue().get(cookieAccessToken);
             if (ObjectUtils.isEmpty(isLogout)) {
-                log.info("avcavavavavavavavavavavavavavava");
                 /*2. 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext 에 저장 */
                 Authentication authentication = jwtProvider.getAuthentication(cookieAccessToken);
-                log.info("cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd");
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
@@ -130,7 +128,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 .set("RT:" + authentication.getName(), tokenDto.getRefreshToken(),
                         tokenDto.getRefreshTokenExpiresIn(), TimeUnit.MILLISECONDS);
 
-        log.info("리이슈 완료");
+        log.info("토큰 재발급 완료");
 
         return tokenDto;
     }

@@ -2,7 +2,6 @@ package fluffysnow.idearly.member.controller;
 
 import fluffysnow.idearly.common.ApiResponse;
 import fluffysnow.idearly.config.CustomUserDetails;
-import fluffysnow.idearly.config.jwt.JwtProvider;
 import fluffysnow.idearly.member.domain.Member;
 import fluffysnow.idearly.member.dto.*;
 import fluffysnow.idearly.member.service.MemberService;
@@ -20,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 @Slf4j
 public class MemberController {
-
-    private final JwtProvider jwtProvider;
 
     private final MemberService memberService;
 
@@ -47,13 +44,13 @@ public class MemberController {
         LoginResponseDto loginResponseDto = memberService.login(loginRequestDto);
         Cookie accessTokenCookie = new Cookie("accessToken", loginResponseDto.getAccessToken());
         accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(60 * 60 * 3); // 액세스 토큰: 3시간
+        accessTokenCookie.setMaxAge(60 * 60 * 24 * 7); // 액세스 토큰: 7일
         accessTokenCookie.setSecure(true);
         accessTokenCookie.setHttpOnly(true);
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", loginResponseDto.getRefreshToken());
         refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(60 * 60 * 3); // 리프레쉬 토큰: 3시간
+        refreshTokenCookie.setMaxAge(60 * 60 * 24 * 7); // 리프레쉬 토큰: 7일
         refreshTokenCookie.setSecure(true);
         refreshTokenCookie.setHttpOnly(true);
 
@@ -61,6 +58,27 @@ public class MemberController {
         response.addCookie(refreshTokenCookie);
 
         return ApiResponse.ok(loginResponseDto);
+    }
+
+    @PostMapping("/reissue")
+    public ApiResponse<Void> reissue(@CookieValue("accessToken") String accessToken, @CookieValue("refreshToken") String refreshToken, HttpServletRequest request, HttpServletResponse response) {
+        TokenRequestDto tokenRequestDto = new TokenRequestDto(accessToken, refreshToken);
+        TokenDto tokenDto = memberService.reissue(tokenRequestDto);
+        Cookie accessTokenCookie = new Cookie("accessToken", tokenDto.getAccessToken());
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(60 * 60 * 24 * 7); // 액세스 토큰: 7일
+        accessTokenCookie.setSecure(true);
+        accessTokenCookie.setHttpOnly(true);
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(60 * 60 * 24 * 7); // 리프레쉬 토큰: 7일
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setHttpOnly(true);
+
+        response.addCookie(accessTokenCookie);
+        response.addCookie(refreshTokenCookie);
+        return ApiResponse.ok(null);
     }
 
     @PostMapping("/logout")

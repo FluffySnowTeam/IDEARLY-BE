@@ -14,7 +14,7 @@ public class CustomUserDetails implements UserDetails {
     private String email;
     private String name;
     private String password;
-    private Role role;
+    private Collection<GrantedAuthority> authorities = new ArrayList<>();
 
 
     public CustomUserDetails(Long memberId, String email, String name, String password, Role role) {
@@ -22,7 +22,7 @@ public class CustomUserDetails implements UserDetails {
         this.email = email;
         this.name = name;
         this.password = password;
-        this.role = role;
+        this.authorities.add((GrantedAuthority) role::toString);
     }
 
     //일반 로그인
@@ -44,9 +44,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> role = new ArrayList<>();
-        role.add((GrantedAuthority) role::toString);
-        return role;
+        return authorities;
     }
 
     @Override

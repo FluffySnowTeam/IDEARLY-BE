@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -66,6 +67,36 @@ public class MemberService {
 
         log.info("로그인 완료");
         return LoginResponseDto.of(principal, tokenDto);
+    }
+
+    public TokenDto reissue(TokenRequestDto dto) {
+        if (!jwtProvider.validateToken(dto.getRefreshToken())) {
+            log.info("FAIL"); //에러 처리
+        }
+
+        Authentication authentication = jwtProvider.getAuthentication(dto.getAccessToken());
+
+        String refreshToken = redisTemplate.opsForValue().get("RT:" + authentication.getName());
+
+        log.info("RefreshToken: {}", refreshToken);
+
+        if (ObjectUtils.isEmpty(refreshToken)) {
+            log.info("잘못된 요청입니다."); //에러 처리
+            throw new UnauthorizedException("인증되지 않은 사용자의 요청입니다.");
+        }
+
+        if (!refreshToken.equals(dto.getRefreshToken())) {
+            log.info("Refresh Token 정보 불일치"); //에러 처리
+            throw new UnauthorizedException("인증되지 않은 사용자의 요청입니다.");
+        }
+
+        TokenDto tokenDto = jwtProvider.createTokenDto(authentication);
+
+        redisTemplate.opsForValue()
+                .set("RT:" + authentication.getName(), tokenDto.getRefreshToken(),
+                        tokenDto.getRefreshTokenExpiresIn(), TimeUnit.MILLISECONDS);
+
+        return tokenDto;
     }
 
     public void logout(TokenRequestDto dto) {

@@ -62,8 +62,8 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new JwtFilter(jwtProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
-        http    .exceptionHandling(configurer -> configurer.authenticationEntryPoint(customAuthenticationEntryPoint)
-                .accessDeniedHandler(customAccessdeniedHandler));
+//        http    .exceptionHandling(configurer -> configurer.authenticationEntryPoint(customAuthenticationEntryPoint)
+//                .accessDeniedHandler(customAccessdeniedHandler));
         return http.build();
     }
 

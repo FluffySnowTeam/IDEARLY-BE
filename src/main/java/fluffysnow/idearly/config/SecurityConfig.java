@@ -53,9 +53,9 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/api/login", "/api/signup/**", "/api/competitions", "api/reissue").permitAll()
-                                .requestMatchers(HttpMethod.GET, "api/competitions/{competitionId}").permitAll()
-                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                            .requestMatchers("/api/login", "/api/signup/**", "/api/competitions", "/api/reissue").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/competitions/{competitionId}").permitAll()
+                                .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                                 .anyRequest().authenticated()
                 );
         http

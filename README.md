@@ -12,6 +12,9 @@
 
 <img width="1470" alt="editor" src="https://github.com/FluffySnowTeam/IDEARLY-BE/assets/71933999/3c41f690-adcf-450b-ae76-a159eae59d08">
 
+## 🎞 시연 영상
+> [IDEARLY 소개 영상 바로가기](https://youtu.be/-WiwIYQPo94?si=t7kVhHtf0b5XHCjv)
+
 ## 🧿 배포 링크
 
 > 💡 [IDEARLY](https://idearly.site)
@@ -23,8 +26,7 @@
 ## 🗂️ 문서화
 
 <a href="https://www.notion.so/jyovelop/f836f24502334367b28580b02f94fc87?pvs=4"><img alt="notion" src ="https://img.shields.io/badge/notion-skyblue.svg?&style=for-the-badge&logo=notion&logoColor=black"/></a>
-<a href="https://youngandmini.atlassian.net/jira/software/projects/ID/boards/4"><img alt="jira" src ="https://img.shields.io/badge/jira-blue?style=for-the-badge&logo=jira&logoColor=white
-"/></a>
+<a href="https://youngandmini.atlassian.net/jira/software/projects/ID/boards/4"><img alt="jira" src ="https://img.shields.io/badge/jira-blue?style=for-the-badge&logo=jira&logoColor=white"/></a>
 <a href="https://www.figma.com/file/RJ7we1YcAouCiT4b5Gr8Aw/Wireframe-Designer-(Community)?type=design&node-id=0%3A1&mode=design&t=k8HhgfQJ0PEWvHgM-1"><img alt="figma" src ="https://img.shields.io/badge/figma-pink.svg?&style=for-the-badge&logo=figma&logoColor=black"/></a>
 
 <!-- ## 📎 배포 링크 -->
@@ -109,7 +111,7 @@
     </td>
     <td>
       <a href="https://github.com/dbswl701">
-        <img src="#" width="120px" height="120px"/>
+        <img src="https://avatars.githubusercontent.com/u/73208914?v=4" width="120px" height="120px"/>
       </a>
     </td>
     <td>
@@ -145,41 +147,21 @@
 ### ⚒️ Stack
 
 
-<img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white">
-<img src="https://img.shields.io/badge/spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white">
-<img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
-<img src="https://img.shields.io/badge/apache tomcat-F8DC75?style=for-the-badge&logo=apachetomcat&logoColor=white">
-<img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
+<img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white"> <img src="https://img.shields.io/badge/spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white"> <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"> <img src="https://img.shields.io/badge/apache tomcat-F8DC75?style=for-the-badge&logo=apachetomcat&logoColor=white"> <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
 
-<img src="https://img.shields.io/badge/spring%20security-6DB33F?style=for-the-badge&logo=spring-security&logoColor=white">
-<img src="https://img.shields.io/badge/redis-DD0031?style=for-the-badge&logo=redis&logoColor=white"/>
-<img src="https://img.shields.io/badge/jwt-black.svg?&style=for-the-badge&logoColor=black"/>
+<img src="https://img.shields.io/badge/spring%20security-6DB33F?style=for-the-badge&logo=spring-security&logoColor=white"> <img src="https://img.shields.io/badge/redis-DD0031?style=for-the-badge&logo=redis&logoColor=white"/> <img src="https://img.shields.io/badge/jwt-black.svg?&style=for-the-badge&logoColor=black"/>
 
 
-<img src="https://img.shields.io/badge/websocket-black?style=for-the-badge&logo=websocket&logoColor=white"/>
-<img src="https://img.shields.io/badge/stomp-black?style=for-the-badge&logoColor=black"/>
+<img src="https://img.shields.io/badge/websocket-black?style=for-the-badge&logo=websocket&logoColor=white"/> <img src="https://img.shields.io/badge/stomp-black?style=for-the-badge&logoColor=black"/>
 
 
-<img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
-<img src="https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=nginx&logoColor=white"/>
-<img src="https://img.shields.io/badge/gradle-grey?style=for-the-badge&logo=gradle&logoColor=white"/>
-<img src="https://img.shields.io/badge/amazon%20ec2-orange?style=for-the-badge&logo=amazonec2&logoColor=white"/>
-<img src="https://img.shields.io/badge/aws%20rds-blue?style=for-the-badge&logo=amazonrds&logoColor=white"/>
-<img src="https://img.shields.io/badge/github%20actions-skyblue?style=for-the-badge&logo=githubactions&logoColor=white"/>
+<img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/> <img src="https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=nginx&logoColor=white"/> <img src="https://img.shields.io/badge/gradle-grey?style=for-the-badge&logo=gradle&logoColor=white"/> <img src="https://img.shields.io/badge/amazon%20ec2-orange?style=for-the-badge&logo=amazonec2&logoColor=white"/> <img src="https://img.shields.io/badge/aws%20rds-blue?style=for-the-badge&logo=amazonrds&logoColor=white"/> <img src="https://img.shields.io/badge/github%20actions-skyblue?style=for-the-badge&logo=githubactions&logoColor=white"/>
 
 
-<img src="https://img.shields.io/badge/intellij%20idea-black?style=for-the-badge&logo=intellijidea&logoColor=white"/>
-<img src="https://img.shields.io/badge/datagrip-darkgreen?style=for-the-badge&logo=datagrip&logoColor=white"/>
+<img src="https://img.shields.io/badge/intellij%20idea-black?style=for-the-badge&logo=intellijidea&logoColor=white"/> <img src="https://img.shields.io/badge/datagrip-darkgreen?style=for-the-badge&logo=datagrip&logoColor=white"/>
 
 ### 👨‍👩‍👧‍👦 Cooperation Tool
 
-<img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
-<img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
+<img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
 
-<img src="https://img.shields.io/badge/postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white"/>
-
-<img src="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white"/>
-<img src="https://img.shields.io/badge/notion-skyblue.svg?&style=for-the-badge&logo=notion&logoColor=black"/>
-<img src="https://img.shields.io/badge/figma-pink.svg?&style=for-the-badge&logo=figma&logoColor=black"/>
-<img src="https://img.shields.io/badge/jira-blue?style=for-the-badge&logo=jira&logoColor=white"/>
-<img src="https://img.shields.io/badge/zep-purple?style=for-the-badge&logoColor=white"/>
+<img src="https://img.shields.io/badge/postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white"/> <img src="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white"/> <img src="https://img.shields.io/badge/notion-skyblue.svg?&style=for-the-badge&logo=notion&logoColor=black"/> <img src="https://img.shields.io/badge/figma-pink.svg?&style=for-the-badge&logo=figma&logoColor=black"/> <img src="https://img.shields.io/badge/jira-blue?style=for-the-badge&logo=jira&logoColor=white"/> <img src="https://img.shields.io/badge/zep-purple?style=for-the-badge&logoColor=white"/>
